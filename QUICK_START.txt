@@ -1,0 +1,77 @@
+╔═══════════════════════════════════════════════════════════════════╗
+║         STEENSMA SHOP MANAGER DASHBOARD - QUICK REFERENCE         ║
+╚═══════════════════════════════════════════════════════════════════╝
+
+📍 LOCATION: /home/ubuntu/shopmgr
+
+🌐 ACCESS DASHBOARD:
+   🔗 https://shop.coresteensma.com (PRIMARY)
+   Local:    http://localhost:5001
+   Network:  http://172.31.24.123:5001
+
+🚀 START APPLICATION:
+   cd /home/ubuntu/shopmgr && ./start.sh
+
+📂 ADD NEW FILES (place in datasheets/ folder):
+   • Shop Schedule - 5 Day - [DATE].xlsx
+   • Open Back Orders - [DATE].xls
+   • Gross Profit Mechanic - [DATE].xls
+
+✅ WHAT'S WORKING:
+   ✓ Dashboard UI with Steensma branding
+   ✓ Parts Received section (14 parts detected!)
+   ✓ Weather widget
+   ✓ Auto-refresh every 5 minutes
+   ✓ File watching system
+   ✓ Historical archiving
+
+⚠️  ACTION REQUIRED (5 minutes):
+   Fix corrupted Excel files by resaving them:
+   1. Open in Excel/Google Sheets
+   2. Select All → Copy
+   3. New spreadsheet → Paste
+   4. Save with same name pattern
+
+📊 DASHBOARD SECTIONS:
+   ┌─────────────────────┬─────────────────────┐
+   │ Today & Fit-In      │ Parts Received      │
+   │ Tomorrow Schedule   │ (Grid View)         │
+   ├─────────────────────┴─────────────────────┤
+   │ Mechanic Metrics                          │
+   │ • Dennis Smurr • Jake Glas • Ray Page    │
+   │ • Overall Shop Efficiency                │
+   └───────────────────────────────────────────┘
+
+🔧 USEFUL COMMANDS:
+   Start Dashboard:      ./start.sh
+   Start (Production):   ./start.sh prod
+   File Watcher:         python file_watcher.py
+   Fix Excel:            python fix_excel.py <file>
+   Stop Server:          Ctrl+C
+
+📁 DIRECTORY STRUCTURE:
+   shopmgr/
+   ├── app.py                 → Main application
+   ├── start.sh               → Startup script
+   ├── templates/             → UI files
+   ├── datasheets/            → ⭐ Put files HERE
+   ├── archive/               → Historical data
+   └── venv/                  → Virtual environment
+
+📖 DOCUMENTATION:
+   • PROJECT_SUMMARY.md  → Complete project overview
+   • SETUP_GUIDE.md      → Detailed setup instructions
+   • README.md           → Technical documentation
+
+💡 TIP: The app auto-finds the most recent files matching each pattern!
+
+🎯 NEXT STEPS:
+   1. Resave Excel files to fix corruption
+   2. Place files in datasheets/
+   3. Start dashboard with ./start.sh
+   4. Open http://172.31.24.123:5001
+   5. Enjoy your daily dashboard!
+
+═══════════════════════════════════════════════════════════════════
+   Questions? All documentation is in the shopmgr/ directory
+═══════════════════════════════════════════════════════════════════
