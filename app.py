@@ -15,13 +15,33 @@ app = Flask(__name__)
 DATASHEETS_DIR = os.path.join(os.path.dirname(__file__), 'datasheets')
 ARCHIVE_DIR = os.path.join(os.path.dirname(__file__), 'archive')
 
-def get_latest_file(pattern):
-    """Get the most recent file matching a pattern"""
-    files = [f for f in os.listdir(DATASHEETS_DIR) if pattern.lower() in f.lower()]
+def get_latest_file(patterns):
+    """Get the most recent file matching one or more patterns"""
+    if isinstance(patterns, str):
+        patterns = [patterns]
+    patterns = [p.lower() for p in patterns]
+    files = [
+        f for f in os.listdir(DATASHEETS_DIR)
+        if any(p in f.lower() for p in patterns)
+    ]
     if not files:
         return None
     latest = max(files, key=lambda f: os.path.getmtime(os.path.join(DATASHEETS_DIR, f)))
     return os.path.join(DATASHEETS_DIR, latest)
+
+def read_excel_safe(filepath, **kwargs):
+    """Read Excel files with engine fallbacks for corrupted styles"""
+    try:
+        if filepath.lower().endswith('.xlsx'):
+            return pd.read_excel(filepath, engine='openpyxl', **kwargs)
+        return pd.read_excel(filepath, engine='xlrd', **kwargs)
+    except Exception as e:
+        try:
+            return pd.read_excel(filepath, engine='calamine', **kwargs)
+        except Exception as e2:
+            print(f"Error reading Excel file {os.path.basename(filepath)}: {e}")
+            print(f"Fallback to calamine failed: {e2}")
+            raise
 
 def parse_shop_schedule(filepath):
     """
@@ -53,19 +73,23 @@ def parse_shop_schedule(filepath):
             for line in lines:
                 line = line.strip()
                 
-                # Check for mechanic name
-                if line.startswith('bDennis Smurr'):
-                    current_mechanic = 'Dennis Smurr'
+                # Check for mechanic name (with or without 'p' prefix or 'b' prefix)
+                if line.startswith('bDerek Snyder') or line.startswith('pDerek Snyder'):
+                    current_mechanic = 'Derek Snyder'
                     in_fit_in_section = False
-                elif line.startswith('bJake Glas'):
-                    current_mechanic = 'Jake Glas'
+                elif line.startswith('bChris Deman') or line.startswith('pChris Deman'):
+                    current_mechanic = 'Chris Deman'
                     in_fit_in_section = False
-                elif line.startswith('bRaymond Page'):
-                    current_mechanic = 'Raymond Page'
+                elif line.startswith('bBrandon Wallace') or line.startswith('pBrandon Wallace'):
+                    current_mechanic = 'Brandon Wallace'
                     in_fit_in_section = False
-                elif line == 'FIT IN WORK':
+                elif line == 'FIT IN WORK' or line.startswith('.pFIT IN') or 'Fit-In' in line:
                     in_fit_in_section = True
                     current_mechanic = 'Fit-In'
+                    continue
+                elif line.startswith('.pHouse Account') or line.startswith('pHouse Account'):
+                    in_fit_in_section = True
+                    current_mechanic = 'House Account'
                     continue
                 
                 # Parse job lines (contain comma-separated data)
@@ -106,9 +130,10 @@ def parse_shop_schedule(filepath):
             return schedule_data
         
         else:
-            # Excel format
-            # Try with openpyxl first, fallback to xlrd for .xls files
-            if filepath.endswith('.xlsx'):
+            # Excel or CSV format
+            if filepath.endswith('.csv'):
+                df = pd.read_csv(filepath)
+            elif filepath.endswith('.xlsx'):
                 df = pd.read_excel(filepath, engine='openpyxl')
             else:
                 df = pd.read_excel(filepath, engine='xlrd')
@@ -124,36 +149,48 @@ def parse_shop_schedule(filepath):
             
             # Find rows with ScheduledStartTime column
             if 'ScheduledStartTime' in df.columns:
+                # Parse dates - handle various formats
                 df['ScheduledStartTime'] = pd.to_datetime(df['ScheduledStartTime'], errors='coerce')
                 
                 # Today's schedule
                 today_df = df[df['ScheduledStartTime'].dt.date == today]
                 for _, row in today_df.iterrows():
                     schedule_data['today'].append({
-                        'customer': row.get('Customer', ''),
-                        'job': row.get('Description', ''),
-                        'mechanic': row.get('Mechanic', ''),
-                        'time': row.get('ScheduledStartTime', '')
+                        'customer': str(row.get('Customer', '')),
+                        'job': f"{row.get('Model', '')} - {row.get('description', '')}"[:80],
+                        'mechanic': str(row.get('Mechanic', '')),
+                        'time': row['ScheduledStartTime'].strftime('%I:%M %p') if pd.notna(row['ScheduledStartTime']) else ''
                     })
                 
                 # Tomorrow's schedule
                 tomorrow_df = df[df['ScheduledStartTime'].dt.date == tomorrow.date()]
                 for _, row in tomorrow_df.iterrows():
                     schedule_data['tomorrow'].append({
-                        'customer': row.get('Customer', ''),
-                        'job': row.get('Description', ''),
-                        'mechanic': row.get('Mechanic', ''),
-                        'time': row.get('ScheduledStartTime', '')
+                        'customer': str(row.get('Customer', '')),
+                        'job': f"{row.get('Model', '')} - {row.get('description', '')}"[:80],
+                        'mechanic': str(row.get('Mechanic', '')),
+                        'time': row['ScheduledStartTime'].strftime('%I:%M %p') if pd.notna(row['ScheduledStartTime']) else ''
                     })
+                
+                # If no today/tomorrow data, show the most recent scheduled jobs
+                if len(schedule_data['today']) == 0 and len(schedule_data['tomorrow']) == 0:
+                    recent_df = df[pd.notna(df['ScheduledStartTime'])].sort_values('ScheduledStartTime', ascending=False).head(15)
+                    for _, row in recent_df.iterrows():
+                        schedule_data['today'].append({
+                            'customer': str(row.get('Customer', '')),
+                            'job': f"{row.get('Model', '')} - {row.get('description', '')}"[:80],
+                            'mechanic': str(row.get('Mechanic', '')),
+                            'time': row['ScheduledStartTime'].strftime('%m/%d %I:%M %p') if pd.notna(row['ScheduledStartTime']) else ''
+                        })
             
-            # Find Fit-Ins (Mechanic column contains "Fit-In")
+            # Find Fit-Ins and House Account jobs (Mechanic column contains "Fit-In" or "House Account")
             if 'Mechanic' in df.columns:
-                fit_in_df = df[df['Mechanic'].astype(str).str.contains('Fit-In', case=False, na=False)]
+                fit_in_df = df[df['Mechanic'].astype(str).str.contains('Fit-In|House Account', case=False, na=False)]
                 for _, row in fit_in_df.iterrows():
                     schedule_data['fit_ins'].append({
-                        'customer': row.get('Customer', ''),
-                        'job': row.get('Description', ''),
-                        'notes': row.get('Notes', '')
+                        'customer': str(row.get('Customer', '')),
+                        'job': f"{row.get('Model', '')} - {row.get('description', '')}"[:80],
+                        'notes': str(row.get('Status', ''))
                     })
             
             return schedule_data
@@ -170,15 +207,19 @@ def parse_open_back_orders(filepath):
     Extract parts where Status is 'Received' or 'Released for Payment'
     """
     try:
-        # Use xlrd for .xls files
-        df = pd.read_excel(filepath, engine='xlrd')
+        # Read file based on extension
+        if filepath.endswith('.csv'):
+            df = pd.read_csv(filepath)
+        else:
+            df = pd.read_excel(filepath, engine='xlrd')
         
         parts_received = []
         
-        # The header is at row 4 (index 4)
+        # The header is at row 4 (index 4) for Excel files
         # Customer is column 1, Part Number is column 9, Status is column 17
-        # Re-read with proper header
-        df = pd.read_excel(filepath, engine='xlrd', header=4)
+        # Re-read with proper header (skip for CSV as it has headers already)
+        if not filepath.endswith('.csv'):
+            df = pd.read_excel(filepath, engine='xlrd', header=4)
         
         # Clean up column names
         df.columns = [str(col).strip() if pd.notna(col) else f'Col_{i}' for i, col in enumerate(df.columns)]
@@ -231,8 +272,8 @@ def parse_gross_profit_mechanic(filepath):
             import re
             
             for line in lines:
-                # Match mechanic summary lines - they start with 'b' and mechanic name
-                if line.startswith('bDennis Smurr,') and len(line) > 50:
+                # Match mechanic summary lines - they start with 'b' or 'p' and mechanic name
+                if (line.startswith('bDerek Snyder,') or line.startswith('pDerek Snyder,')) and len(line) > 50:
                     # Use regex to extract dollar amounts: $4,272.09
                     # The pattern is: Parts Sales, Parts COGS, Parts %, Labor Sales, Labor COGS, Labor %, etc.
                     dollar_amounts = re.findall(r'\$[\d,]+\.?\d*', line)
@@ -245,12 +286,12 @@ def parse_gross_profit_mechanic(filepath):
                             labor_sales = 0
                         
                         mechanic_metrics.append({
-                            'name': 'Dennis Smurr',
+                            'name': 'Derek Snyder',
                             'efficiency': 0,  # Will update from Hours Worked line
                             'labor_sales': labor_sales
                         })
                 
-                elif line.startswith('bJake Glas,') and len(line) > 50:
+                elif (line.startswith('bChris Deman,') or line.startswith('pChris Deman,')) and len(line) > 50:
                     dollar_amounts = re.findall(r'\$[\d,]+\.?\d*', line)
                     if len(dollar_amounts) >= 3:
                         labor_sales = dollar_amounts[2].replace('$', '').replace(',', '')
@@ -260,12 +301,12 @@ def parse_gross_profit_mechanic(filepath):
                             labor_sales = 0
                         
                         mechanic_metrics.append({
-                            'name': 'Jake Glas',
+                            'name': 'Chris Deman',
                             'efficiency': 0,
                             'labor_sales': labor_sales
                         })
                 
-                elif line.startswith('bRaymond Page,') and len(line) > 50:
+                elif (line.startswith('bBrandon Wallace,') or line.startswith('pBrandon Wallace,')) and len(line) > 50:
                     dollar_amounts = re.findall(r'\$[\d,]+\.?\d*', line)
                     if len(dollar_amounts) >= 3:
                         labor_sales = dollar_amounts[2].replace('$', '').replace(',', '')
@@ -275,7 +316,7 @@ def parse_gross_profit_mechanic(filepath):
                             labor_sales = 0
                         
                         mechanic_metrics.append({
-                            'name': 'Ray Page',
+                            'name': 'Brandon Wallace',
                             'efficiency': 0,
                             'labor_sales': labor_sales
                         })
@@ -304,14 +345,65 @@ def parse_gross_profit_mechanic(filepath):
                 'overall_efficiency': overall_efficiency
             }
         
-        # If not a text file, try Excel parsing
+        # If not a text file, try Excel or CSV parsing
         else:
-            df = pd.read_excel(filepath, engine='xlrd')
+            if filepath.endswith('.csv'):
+                df = pd.read_csv(filepath)
+                
+                # Parse CSV: aggregate by mechanic name
+                mechanic_metrics = []
+                mechanic_names = ['Derek Snyder', 'Chris Deman', 'Brandon Wallace']
+                
+                for mechanic_name in mechanic_names:
+                    # Filter rows for this mechanic (with 'p' prefix, case-insensitive)
+                    mechanic_rows = df[df['Mechanic'].str.contains(mechanic_name, case=False, na=False, regex=False)]
+                    
+                    if not mechanic_rows.empty:
+                        # Sum up Labor Sales
+                        labor_sales = 0
+                        for _, row in mechanic_rows.iterrows():
+                            labor_val = str(row.get('Labor Sales', '0'))
+                            # Clean currency formatting
+                            labor_val = labor_val.replace('$', '').replace(',', '').replace('(', '-').replace(')', '')
+                            try:
+                                labor_sales += float(labor_val)
+                            except:
+                                pass
+                        
+                        # Calculate efficiency from Time Billed / Time Actual
+                        time_billed_total = 0
+                        time_actual_total = 0
+                        for _, row in mechanic_rows.iterrows():
+                            tb = str(row.get('Time Billed', '0:00'))
+                            ta = str(row.get('Time Actual', '0:00'))
+                            # Convert HH:MM to minutes
+                            try:
+                                if ':' in tb:
+                                    h, m = tb.split(':')
+                                    time_billed_total += int(h) * 60 + int(m)
+                                if ':' in ta:
+                                    h, m = ta.split(':')
+                                    time_actual_total += int(h) * 60 + int(m)
+                            except:
+                                pass
+                        
+                        efficiency = 0
+                        if time_actual_total > 0:
+                            efficiency = (time_billed_total / time_actual_total) * 100
+                        
+                        mechanic_metrics.append({
+                            'name': mechanic_name,
+                            'efficiency': round(efficiency, 1),
+                            'labor_sales': round(labor_sales, 2)
+                        })
+                
+            else:
+                df = pd.read_excel(filepath, engine='xlrd')
             
             mechanics = {
-                'Dennis Smurr': {'efficiency_cell': 'G120', 'labor_cell': 'O119'},
-                'Jake Glas': {'efficiency_cell': 'G189', 'labor_cell': 'O188'},
-                'Ray Page': {'efficiency_cell': 'G233', 'labor_cell': 'O232'}
+                'Derek Snyder': {'efficiency_cell': 'G120', 'labor_cell': 'O119'},
+                'Chris Deman': {'efficiency_cell': 'G189', 'labor_cell': 'O188'},
+                'Brandon Wallace': {'efficiency_cell': 'G233', 'labor_cell': 'O232'}
             }
             
             mechanic_metrics = []
@@ -419,11 +511,11 @@ def get_data():
 
 @app.route('/api/weather')
 def get_weather():
-    """Fetch current weather for Battle Creek, MI"""
+    """Fetch current weather for Plainwell, MI"""
     try:
         import requests
         # Using wttr.in for simple weather data (no API key needed)
-        response = requests.get('https://wttr.in/Battle+Creek,MI?format=j1', timeout=5)
+        response = requests.get('https://wttr.in/Plainwell,MI?format=j1', timeout=5)
         if response.status_code == 200:
             weather_data = response.json()
             current = weather_data['current_condition'][0]
