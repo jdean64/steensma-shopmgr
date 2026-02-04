@@ -208,7 +208,39 @@ def parse_open_back_orders(filepath):
     """
     try:
         # Read file based on extension
-        if filepath.endswith('.csv'):
+        if filepath.endswith('.txt'):
+            # Parse text format
+            with open(filepath, 'r') as f:
+                content = f.read()
+            
+            parts_received = []
+            lines = content.split('\n')
+            
+            # Look for lines with "Received" or "Released for Payment"
+            for line in lines:
+                line = line.strip()
+                if not line or ',' not in line:
+                    continue
+                
+                # Check for received/released status
+                if 'Received' in line or 'Released for Payment' in line:
+                    parts = line.split(',')
+                    if len(parts) >= 3:
+                        # Format: Customer,Phone,Part Number,...,Status,...
+                        customer = parts[0].strip() if parts[0] else ''
+                        part_number = parts[2].strip() if len(parts) > 2 else ''
+                        status = 'Released for Payment' if 'Released for Payment' in line else 'Received'
+                        
+                        if part_number and part_number != 'Part Number':  # Skip header
+                            parts_received.append({
+                                'part_number': part_number,
+                                'customer': customer if customer and customer != 'Customer' else 'N/A',
+                                'status': status
+                            })
+            
+            return parts_received
+        
+        elif filepath.endswith('.csv'):
             df = pd.read_csv(filepath)
         else:
             df = pd.read_excel(filepath, engine='xlrd')
@@ -291,7 +323,8 @@ def parse_gross_profit_mechanic(filepath):
                             'labor_sales': labor_sales
                         })
                 
-                elif (line.startswith('bChris Deman,') or line.startswith('pChris Deman,')) and len(line) > 50:
+                elif (line.startswith('bChris Deman,') or line.startswith('pChris Deman,') or 
+                      line.startswith('pCHRIS DEMANN,') or line.startswith('bCHRIS DEMANN,')) and len(line) > 50:
                     dollar_amounts = re.findall(r'\$[\d,]+\.?\d*', line)
                     if len(dollar_amounts) >= 3:
                         labor_sales = dollar_amounts[2].replace('$', '').replace(',', '')
