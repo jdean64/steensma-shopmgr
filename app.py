@@ -204,7 +204,7 @@ def parse_shop_schedule(filepath):
 def parse_open_back_orders(filepath):
     """
     Parse Open Back Orders file
-    Extract parts where Status is 'Received' or 'Released for Payment'
+    Extract parts where Status is 'Back-Ordered' or 'On Order'
     """
     try:
         # Read file based on extension
@@ -216,20 +216,20 @@ def parse_open_back_orders(filepath):
             parts_received = []
             lines = content.split('\n')
             
-            # Look for lines with "Received" or "Released for Payment"
+            # Look for lines with "Back-Ordered" or "On Order"
             for line in lines:
                 line = line.strip()
                 if not line or ',' not in line:
                     continue
                 
-                # Check for received/released status
-                if 'Received' in line or 'Released for Payment' in line:
+                # Check for back-ordered/on order status
+                if 'Back-Ordered' in line or 'On Order' in line:
                     parts = line.split(',')
                     if len(parts) >= 3:
                         # Format: Customer,Phone,Part Number,...,Status,...
                         customer = parts[0].strip() if parts[0] else ''
                         part_number = parts[2].strip() if len(parts) > 2 else ''
-                        status = 'Released for Payment' if 'Released for Payment' in line else 'Received'
+                        status = 'Back-Ordered' if 'Back-Ordered' in line else 'On Order'
                         
                         if part_number and part_number != 'Part Number':  # Skip header
                             parts_received.append({
@@ -261,14 +261,14 @@ def parse_open_back_orders(filepath):
         part_col = df.columns[9]  # Part number is at column index 9
         status_col = 'Status' if 'Status' in df.columns else df.columns[17]
         
-        # Filter for Received or Released for Payment
+        # Filter for Back-Ordered or On Order
         for _, row in df.iterrows():
             status = str(row[status_col]).strip() if pd.notna(row[status_col]) else ''
             part_number = str(row[part_col]).strip() if pd.notna(row[part_col]) else ''
             customer = str(row[customer_col]).strip() if pd.notna(row[customer_col]) else ''
             
-            # Check if status contains Received or Released
-            if ('received' in status.lower() or 'released' in status.lower()) and part_number and part_number != 'nan':
+            # Check if status contains Back-Ordered or On Order
+            if ('back-ordered' in status.lower() or 'on order' in status.lower()) and part_number and part_number != 'nan':
                 parts_received.append({
                     'part_number': part_number,
                     'customer': customer if customer and customer != 'nan' else 'N/A',
