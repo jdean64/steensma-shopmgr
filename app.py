@@ -513,19 +513,21 @@ def find_quarterly_sales_file():
         if f.lower().endswith('.txt')
     ]
     
-    # Prefer files that contain the Site lead Statement header
-    candidates = []
-    for path in txt_files:
+    if not txt_files:
+        return None
+    
+    # Check most recently modified files first (faster)
+    txt_files_sorted = sorted(txt_files, key=os.path.getmtime, reverse=True)
+    
+    # Check only the 5 most recent files to avoid reading all files
+    for path in txt_files_sorted[:5]:
         try:
             with open(path, 'r') as f:
-                head = ''.join([next(f) for _ in range(5)])
+                head = ''.join([next(f) for _ in range(3)])
             if 'Site lead Statement' in head:
-                candidates.append(path)
+                return path
         except Exception:
             continue
-    
-    if candidates:
-        return max(candidates, key=os.path.getmtime)
     
     return None
 
@@ -580,8 +582,8 @@ def parse_quarterly_sales(filepath):
             parts_sales['ytd'] = parse_money(parts_vals[1])
         
         # Q1 bonus targets
-        new_equipment_target = 1570000.00
-        parts_target = 550000.00
+        new_equipment_target = 795000.00
+        parts_target = 328000.00
         
         return {
             'new_equipment': new_equipment,
@@ -596,7 +598,7 @@ def parse_quarterly_sales(filepath):
         return {
             'new_equipment': {'month': 0.0, 'ytd': 0.0},
             'parts': {'month': 0.0, 'ytd': 0.0},
-            'targets': {'new_equipment': 1570000.00, 'parts': 550000.00}
+            'targets': {'new_equipment': 795000.00, 'parts': 328000.00}
         }
 
 
@@ -623,7 +625,7 @@ def get_data():
         'quarterly_sales': {
             'new_equipment': {'month': 0.0, 'ytd': 0.0},
             'parts': {'month': 0.0, 'ytd': 0.0},
-            'targets': {'new_equipment': 1570000.00, 'parts': 550000.00}
+            'targets': {'new_equipment': 795000.00, 'parts': 328000.00}
         }
     }
     
@@ -673,4 +675,4 @@ if __name__ == '__main__':
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
     
     # Run the app
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=False)
