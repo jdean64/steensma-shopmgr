@@ -369,6 +369,71 @@
             margin-bottom: 15px;
             font-size: 14px;
         }
+
+        /* Quarterly Sales */
+        .quarterly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 10px;
+        }
+        .quarterly-card {
+            background: #0f172a;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            padding: 16px;
+        }
+        .quarterly-card h4 {
+            margin: 0 0 8px 0;
+            font-size: 14px;
+            color: #cbd5f5;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .quarterly-values {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 10px;
+        }
+        .quarterly-value {
+            background: #111827;
+            border: 1px solid #1f2937;
+            border-radius: 8px;
+            padding: 10px;
+        }
+        .quarterly-label {
+            font-size: 11px;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .quarterly-amount {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f8fafc;
+        }
+        .quarterly-target {
+            font-size: 12px;
+            color: #94a3b8;
+        }
+        .progress-bar {
+            height: 8px;
+            background: #0b1220;
+            border-radius: 999px;
+            overflow: hidden;
+            border: 1px solid #1f2937;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #22c55e, #16a34a);
+            width: 0%;
+        }
+        .progress-text {
+            margin-top: 6px;
+            font-size: 12px;
+            color: #cbd5f5;
+        }
     </style>
 </head>
 <body>
@@ -430,6 +495,17 @@
                         </div>
                         <div class="parts-grid" id="partsReceived"></div>
                     </div>
+                </div>
+
+                <!-- Quarterly Sales -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <div class="section-icon">📈</div>
+                            Quarterly Sales
+                        </div>
+                    </div>
+                    <div class="quarterly-grid" id="quarterlySales"></div>
                 </div>
 
                 <!-- Mechanic Metrics -->
@@ -500,6 +576,9 @@
                 // Display Mechanic Metrics
                 displayMetrics(data.mechanic_metrics);
 
+                // Display Quarterly Sales
+                displayQuarterlySales(data.quarterly_sales);
+
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
                 document.getElementById('loadingState').innerHTML = 
@@ -553,6 +632,54 @@
             } else {
                 tomorrowContainer.innerHTML = '<div class="empty-state">No scheduled jobs tomorrow</div>';
             }
+        }
+
+        function displayQuarterlySales(qs) {
+            const container = document.getElementById('quarterlySales');
+            if (!qs) {
+                container.innerHTML = '<div class="empty-state">No quarterly sales data available.</div>';
+                return;
+            }
+
+            const formatMoney = (value) => {
+                const num = Number(value || 0);
+                return num.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 });
+            };
+
+            const makeCard = (title, data, target) => {
+                const ytd = Number(data?.ytd || 0);
+                const month = Number(data?.month || 0);
+                const pct = target > 0 ? Math.min(100, (ytd / target) * 100) : 0;
+
+                return `
+                    <div class="quarterly-card">
+                        <h4>${title}</h4>
+                        <div class="quarterly-values">
+                            <div class="quarterly-value">
+                                <div class="quarterly-label">Month</div>
+                                <div class="quarterly-amount">${formatMoney(month)}</div>
+                            </div>
+                            <div class="quarterly-value">
+                                <div class="quarterly-label">YTD 2026</div>
+                                <div class="quarterly-amount">${formatMoney(ytd)}</div>
+                            </div>
+                        </div>
+                        <div class="quarterly-target">Q1 Bonus Target: ${formatMoney(target)}</div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${pct.toFixed(1)}%"></div>
+                        </div>
+                        <div class="progress-text">${pct.toFixed(1)}% of target</div>
+                    </div>
+                `;
+            };
+
+            const newTarget = qs.targets?.new_equipment || 1570000;
+            const partsTarget = qs.targets?.parts || 550000;
+
+            container.innerHTML = [
+                makeCard('New Equipment Sales', qs.new_equipment, newTarget),
+                makeCard('Parts Sales', qs.parts, partsTarget)
+            ].join('');
         }
 
         function displayParts(parts) {

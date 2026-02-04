@@ -504,6 +504,102 @@ def parse_gross_profit_mechanic(filepath):
         traceback.print_exc()
         return {'mechanics': [], 'overall_efficiency': 0}
 
+
+def find_quarterly_sales_file():
+    """Find the most recent Site lead Statement text file"""
+    txt_files = [
+        os.path.join(DATASHEETS_DIR, f)
+        for f in os.listdir(DATASHEETS_DIR)
+        if f.lower().endswith('.txt')
+    ]
+    
+    # Prefer files that contain the Site lead Statement header
+    candidates = []
+    for path in txt_files:
+        try:
+            with open(path, 'r') as f:
+                head = ''.join([next(f) for _ in range(5)])
+            if 'Site lead Statement' in head:
+                candidates.append(path)
+        except Exception:
+            continue
+    
+    if candidates:
+        return max(candidates, key=os.path.getmtime)
+    
+    return None
+
+
+def parse_quarterly_sales(filepath):
+    """
+    Parse Site lead Statement file for quarterly sales metrics
+    Extract New Equipment Sales and Parts Sales (Month and YTD 2026)
+    """
+    def parse_money(value):
+        if value is None:
+            return 0.0
+        s = str(value).strip()
+        if not s:
+            return 0.0
+        s = s.replace('$', '').replace(',', '')
+        if s.startswith('(') and s.endswith(')'):
+            s = '-' + s[1:-1]
+        try:
+            return float(s)
+        except:
+            return 0.0
+    
+    try:
+        with open(filepath, 'r') as f:
+            lines = [line.strip() for line in f.readlines()]
+        
+        new_equipment = {'month': 0.0, 'ytd': 0.0}
+        parts_sales = {'month': 0.0, 'ytd': 0.0}
+        
+        import re
+        
+        def next_values_after(label):
+            for idx, line in enumerate(lines):
+                if line.upper() == label:
+                    # Find next non-empty line with numeric values
+                    for j in range(idx + 1, min(idx + 4, len(lines))):
+                        if lines[j] and ',' in lines[j]:
+                            # Extract money-like values with commas/decimals
+                            return re.findall(r'\(?[\d,]+\.\d{2}\)?', lines[j])
+            return []
+        
+        new_vals = next_values_after('NEW EQUIPMENT SALES')
+        parts_vals = next_values_after('PARTS SALES')
+        
+        if len(new_vals) >= 2:
+            new_equipment['month'] = parse_money(new_vals[0])
+            new_equipment['ytd'] = parse_money(new_vals[1])
+        
+        if len(parts_vals) >= 2:
+            parts_sales['month'] = parse_money(parts_vals[0])
+            parts_sales['ytd'] = parse_money(parts_vals[1])
+        
+        # Q1 bonus targets
+        new_equipment_target = 1570000.00
+        parts_target = 550000.00
+        
+        return {
+            'new_equipment': new_equipment,
+            'parts': parts_sales,
+            'targets': {
+                'new_equipment': new_equipment_target,
+                'parts': parts_target
+            }
+        }
+    except Exception as e:
+        print(f"Error parsing quarterly sales: {e}")
+        return {
+            'new_equipment': {'month': 0.0, 'ytd': 0.0},
+            'parts': {'month': 0.0, 'ytd': 0.0},
+            'targets': {'new_equipment': 1570000.00, 'parts': 550000.00}
+        }
+
+
 @app.route('/')
 def index():
     """Main dashboard page"""
@@ -517,12 +613,18 @@ def get_data():
     schedule_file = get_latest_file('Scheduled Shop Jobs')
     backorders_file = get_latest_file('Open Back Orders')
     grossprofit_file = get_latest_file('Sales and Gross')
+    quarterly_sales_file = find_quarterly_sales_file()
     
     data = {
         'timestamp': datetime.now().isoformat(),
         'schedule': {'today': [], 'tomorrow': [], 'fit_ins': []},
         'parts_received': [],
-        'mechanic_metrics': {'mechanics': [], 'overall_efficiency': 0}
+        'mechanic_metrics': {'mechanics': [], 'overall_efficiency': 0},
+        'quarterly_sales': {
+            'new_equipment': {'month': 0.0, 'ytd': 0.0},
+            'parts': {'month': 0.0, 'ytd': 0.0},
+            'targets': {'new_equipment': 1570000.00, 'parts': 550000.00}
+        }
     }
     
     # Parse Shop Schedule
@@ -539,6 +641,10 @@ def get_data():
     # Parse Gross Profit Mechanic
     if grossprofit_file:
         data['mechanic_metrics'] = parse_gross_profit_mechanic(grossprofit_file)
+    
+    # Parse Quarterly Sales
+    if quarterly_sales_file:
+        data['quarterly_sales'] = parse_quarterly_sales(quarterly_sales_file)
     
     return jsonify(data)
 
