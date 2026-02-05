@@ -535,7 +535,7 @@ def find_quarterly_sales_file():
 def parse_quarterly_sales(filepath):
     """
     Parse Site lead Statement file for quarterly sales metrics
-    Extract New Equipment Sales and Parts Sales (Month and YTD 2026)
+    Extract New Equipment Sales, Parts Sales, and Labor Sales (Month and YTD 2026)
     """
     def parse_money(value):
         if value is None:
@@ -557,6 +557,7 @@ def parse_quarterly_sales(filepath):
         
         new_equipment = {'month': 0.0, 'ytd': 0.0}
         parts_sales = {'month': 0.0, 'ytd': 0.0}
+        labor_sales = {'month': 0.0, 'ytd': 0.0}
         
         import re
         
@@ -572,6 +573,7 @@ def parse_quarterly_sales(filepath):
         
         new_vals = next_values_after('NEW EQUIPMENT SALES')
         parts_vals = next_values_after('PARTS SALES')
+        labor_vals = next_values_after('LABOR SALES')
         
         if len(new_vals) >= 2:
             new_equipment['month'] = parse_money(new_vals[0])
@@ -581,16 +583,23 @@ def parse_quarterly_sales(filepath):
             parts_sales['month'] = parse_money(parts_vals[0])
             parts_sales['ytd'] = parse_money(parts_vals[1])
         
+        if len(labor_vals) >= 2:
+            labor_sales['month'] = parse_money(labor_vals[0])
+            labor_sales['ytd'] = parse_money(labor_vals[1])
+        
         # Q1 bonus targets
         new_equipment_target = 795000.00
         parts_target = 328000.00
+        labor_target = 250000.00
         
         return {
             'new_equipment': new_equipment,
             'parts': parts_sales,
+            'labor': labor_sales,
             'targets': {
                 'new_equipment': new_equipment_target,
-                'parts': parts_target
+                'parts': parts_target,
+                'labor': labor_target
             }
         }
     except Exception as e:
@@ -598,7 +607,8 @@ def parse_quarterly_sales(filepath):
         return {
             'new_equipment': {'month': 0.0, 'ytd': 0.0},
             'parts': {'month': 0.0, 'ytd': 0.0},
-            'targets': {'new_equipment': 795000.00, 'parts': 328000.00}
+            'labor': {'month': 0.0, 'ytd': 0.0},
+            'targets': {'new_equipment': 795000.00, 'parts': 328000.00, 'labor': 250000.00}
         }
 
 
@@ -625,7 +635,8 @@ def get_data():
         'quarterly_sales': {
             'new_equipment': {'month': 0.0, 'ytd': 0.0},
             'parts': {'month': 0.0, 'ytd': 0.0},
-            'targets': {'new_equipment': 795000.00, 'parts': 328000.00}
+            'labor': {'month': 0.0, 'ytd': 0.0},
+            'targets': {'new_equipment': 795000.00, 'parts': 328000.00, 'labor': 250000.00}
         }
     }
     

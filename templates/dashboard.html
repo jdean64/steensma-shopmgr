@@ -675,10 +675,12 @@
 
             const newTarget = qs.targets?.new_equipment || 1570000;
             const partsTarget = qs.targets?.parts || 550000;
+            const laborTarget = qs.targets?.labor || 250000;
 
             container.innerHTML = [
                 makeCard('New Equipment Sales', qs.new_equipment, newTarget),
-                makeCard('Parts Sales', qs.parts, partsTarget)
+                makeCard('Parts Sales', qs.parts, partsTarget),
+                makeCard('Labor Sales', qs.labor, laborTarget)
             ].join('');
         }
 
