@@ -573,7 +573,7 @@ def parse_quarterly_sales(filepath):
         
         new_vals = next_values_after('NEW EQUIPMENT SALES')
         parts_vals = next_values_after('PARTS SALES')
-        labor_vals = next_values_after('LABOR SALES')
+        labor_vals = next_values_after('SERVICE LABOR SALES')
         
         if len(new_vals) >= 2:
             new_equipment['month'] = parse_money(new_vals[0])
