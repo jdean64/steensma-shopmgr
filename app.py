@@ -118,14 +118,10 @@ def parse_shop_schedule(filepath):
                             'status': status
                         }
                         
-                        # Add to fit-ins if in that section
-                        if in_fit_in_section:
+                        # Only include if it's a fit-in or house account job
+                        if in_fit_in_section and current_mechanic in ['Fit-In', 'House Account']:
                             schedule_data['fit_ins'].append(job_data)
-                        # Otherwise check date
-                        elif start_time == today_str:
-                            schedule_data['today'].append(job_data)
-                        elif start_time == tomorrow_str:
-                            schedule_data['tomorrow'].append(job_data)
+                        # Skip regular mechanic jobs (Derek, Chris, Brandon)
             
             return schedule_data
         
