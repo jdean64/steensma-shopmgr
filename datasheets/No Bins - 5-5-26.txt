@@ -1,0 +1,14 @@
+Steensma Lawn Plainwell361 12th st.Plainwell, MI  49080,
+Bin Census Detailed
+Zone
+Bin,Line Code,Part Number,O/C,Description,Class,Available
+
+,JOHP,MIA11564,N,STARTER MOTOR,,1
+,JOHP,R139898,N,O RING,,-1
+,STIP,0781-516-5012,N,SIMPLE PLUS BAR & CHAIN OIL 1 GAL,Oil,3
+,TORP,55-8760,N,SCRAPER,,-1
+,TORP,55-9300,N,BELT   DRIVE,,-1
+,WSPP,78417,N,HARNESS ASSY, HOPPER,,1
+Bin Census Detailed - 2/5/2026 7:45 AM, Page,1,1
+ of
+1
