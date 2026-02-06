@@ -654,6 +654,17 @@
                             <div id="poOver30Table"></div>
                         </div>
                     </div>
+
+                    <!-- Gross Profit YTD -->
+                    <div class="expandable-section">
+                        <div class="expandable-header" onclick="toggleSection('grossProfitContent')">
+                            <span id="grossProfitTitle">📈 Gross Profit YTD</span>
+                            <span class="toggle-icon" id="grossProfitToggle">▼</span>
+                        </div>
+                        <div class="expandable-content" id="grossProfitContent" style="display: none;">
+                            <div id="grossProfitChart"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -720,6 +731,9 @@
 
                 // Display PO Over 30
                 displayPOOver30(data.po_over_30);
+
+                // Display Gross Profit YTD
+                displayGrossProfitYTD(data.quarterly_sales);
 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
@@ -1050,6 +1064,81 @@
             `;
             
             tableElement.innerHTML = tableHTML;
+        }
+
+        // Display Gross Profit YTD
+        function displayGrossProfitYTD(qs) {
+            const chartElement = document.getElementById('grossProfitChart');
+            
+            if (!qs) {
+                chartElement.innerHTML = '<div class="empty-state" style="color: #94a3b8;">No gross profit data available</div>';
+                return;
+            }
+            
+            const newEquipYTD = Number(qs.new_equipment?.ytd || 0);
+            const partsYTD = Number(qs.parts?.ytd || 0);
+            const laborYTD = Number(qs.labor?.ytd || 0);
+            const totalYTD = newEquipYTD + partsYTD + laborYTD;
+            const targetAnnual = 7500000; // $7.5M annual goal
+            
+            const percentComplete = (totalYTD / targetAnnual) * 100;
+            const currentMonth = new Date().getMonth() + 1; // 1-12
+            const expectedPercent = (currentMonth / 12) * 100;
+            const onTrack = percentComplete >= (expectedPercent - 5); // Within 5% tolerance
+            
+            const formatMoney = (value) => {
+                return value.toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+            };
+            
+            const chartHTML = `
+                <div style="padding: 10px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                        <div>
+                            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 5px;">TOTAL YTD GROSS PROFIT</div>
+                            <div style="font-size: 28px; font-weight: 700; color: #cbd5f5;">${formatMoney(totalYTD)}</div>
+                            <div style="font-size: 12px; color: #94a3b8; margin-top: 5px;">
+                                ${percentComplete.toFixed(1)}% of ${formatMoney(targetAnnual)} annual goal
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size: 12px; color: #94a3b8; margin-bottom: 5px;">STATUS</div>
+                            <div style="font-size: 20px; font-weight: 600; color: ${onTrack ? '#22c55e' : '#f97316'}; margin-top: 10px;">
+                                ${onTrack ? '✓ On Track' : '⚠ Behind Pace'}
+                            </div>
+                            <div style="font-size: 12px; color: #94a3b8; margin-top: 5px;">
+                                Expected: ${expectedPercent.toFixed(1)}% by month ${currentMonth}
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div style="background: #111827; border-radius: 8px; padding: 15px; margin-bottom: 15px;">
+                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                            <span style="font-size: 12px; color: #94a3b8;">Progress to Goal</span>
+                            <span style="font-size: 12px; font-weight: 600; color: #cbd5f5;">${formatMoney(totalYTD)} / ${formatMoney(targetAnnual)}</span>
+                        </div>
+                        <div style="background: #1e293b; height: 24px; border-radius: 12px; overflow: hidden;">
+                            <div style="background: linear-gradient(90deg, #22c55e, #16a34a); height: 100%; width: ${Math.min(percentComplete, 100)}%; transition: width 1s;"></div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;">
+                        <div style="background: #111827; padding: 12px; border-radius: 8px; border: 1px solid #1e293b;">
+                            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">NEW EQUIPMENT</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #cbd5f5;">${formatMoney(newEquipYTD)}</div>
+                        </div>
+                        <div style="background: #111827; padding: 12px; border-radius: 8px; border: 1px solid #1e293b;">
+                            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">PARTS</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #cbd5f5;">${formatMoney(partsYTD)}</div>
+                        </div>
+                        <div style="background: #111827; padding: 12px; border-radius: 8px; border: 1px solid #1e293b;">
+                            <div style="font-size: 11px; color: #94a3b8; margin-bottom: 4px;">LABOR</div>
+                            <div style="font-size: 18px; font-weight: 600; color: #cbd5f5;">${formatMoney(laborYTD)}</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            chartElement.innerHTML = chartHTML;
         }
 
         // Initialize
