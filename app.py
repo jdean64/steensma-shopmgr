@@ -347,6 +347,78 @@ def parse_backorders_over_5(filepath):
         traceback.print_exc()
         return []
 
+def parse_po_over_30(filepath):
+    """
+    Parse PO Over 30 file
+    Extract purchase orders 30+ days old grouped by vendor
+    """
+    try:
+        with open(filepath, 'r') as f:
+            content = f.read()
+        
+        po_data = []
+        lines = content.split('\n')
+        current_vendor = None
+        
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+            
+            # Skip header lines
+            if 'Purchase Order' in line or 'Steensma' in line or 'Vendor Name' in line:
+                continue
+            if 'PO Number' in line or 'Ordered' in line:
+                continue
+            
+            # Check if this is a vendor name line (no commas, or minimal structure)
+            parts = line.split(',')
+            
+            # Vendor lines typically have few columns or are standalone names
+            if len(parts) <= 2 and not line[0].isdigit():
+                # This is likely a vendor name
+                current_vendor = parts[0].strip()
+                continue
+            
+            # PO lines have format: PO Number,Age,Status,Since,Return,Items,Pieces,Total,...
+            if len(parts) >= 8 and current_vendor:
+                po_number = parts[0].strip()
+                age_str = parts[1].strip()
+                status = parts[2].strip()
+                since = parts[3].strip()
+                items = parts[5].strip()
+                total = parts[7].strip()
+                
+                # Try to parse age
+                try:
+                    age = int(age_str) if age_str else 0
+                except ValueError:
+                    continue
+                
+                # Only include POs 30+ days old
+                if age >= 30 and po_number:
+                    po_data.append({
+                        'vendor': current_vendor,
+                        'po_number': po_number,
+                        'age': age,
+                        'status': status,
+                        'since': since,
+                        'items': items,
+                        'total': total,
+                        'priority': 'critical' if age >= 90 else 'high' if age >= 60 else 'medium'
+                    })
+        
+        # Sort by age descending (oldest first)
+        po_data.sort(key=lambda x: x['age'], reverse=True)
+        
+        return po_data
+    
+    except Exception as e:
+        print(f"Error parsing PO over 30: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
+
 def parse_no_bins(filepath):
     """
     Parse No Bins file
@@ -742,6 +814,7 @@ def get_data():
     grossprofit_file = get_latest_file('Sales and Gross')
     quarterly_sales_file = find_quarterly_sales_file()
     no_bins_file = get_latest_file('No Bins')
+    po_over_30_file = get_latest_file('PO Over 30')
     
     data = {
         'timestamp': datetime.now().isoformat(),
@@ -755,7 +828,8 @@ def get_data():
             'targets': {'new_equipment': 795000.00, 'parts': 328000.00, 'labor': 250000.00}
         },
         'no_bins': [],
-        'backorders_over_5': []
+        'backorders_over_5': [],
+        'po_over_30': []
     }
     
     # Parse Shop Schedule
@@ -781,6 +855,10 @@ def get_data():
     # Parse No Bins
     if no_bins_file:
         data['no_bins'] = parse_no_bins(no_bins_file)
+    
+    # Parse PO Over 30
+    if po_over_30_file:
+        data['po_over_30'] = parse_po_over_30(po_over_30_file)
     
     return jsonify(data)
 
