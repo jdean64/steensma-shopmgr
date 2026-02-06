@@ -489,6 +489,39 @@
         .parts-table tr:hover {
             background: #1e293b;
         }
+        
+        /* Priority badges */
+        .priority-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .priority-critical {
+            background: #dc2626;
+            color: white;
+        }
+        .priority-high {
+            background: #f97316;
+            color: white;
+        }
+        .priority-medium {
+            background: #fbbf24;
+            color: #1f2937;
+        }
+        .priority-normal {
+            background: #10b981;
+            color: white;
+        }
+        .phone-link {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+        .phone-link:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body>
@@ -599,6 +632,17 @@
                             <div id="noBinsTable"></div>
                         </div>
                     </div>
+
+                    <!-- Back Orders Over 5 Days -->
+                    <div class="expandable-section">
+                        <div class="expandable-header" onclick="toggleSection('backordersContent')">
+                            <span id="backordersTitle">⚠️ Back Orders 5+ Days (0 items)</span>
+                            <span class="toggle-icon" id="backordersToggle">▼</span>
+                        </div>
+                        <div class="expandable-content" id="backordersContent" style="display: none;">
+                            <div id="backordersTable"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -659,6 +703,9 @@
 
                 // Display No Bins
                 displayNoBins(data.no_bins);
+
+                // Display Back Orders Over 5
+                displayBackordersOver5(data.backorders_over_5);
 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
@@ -873,6 +920,59 @@
                                 <td><strong>${item.part_number}</strong></td>
                                 <td>${item.description || ''}</td>
                                 <td style="text-align: center;">${item.available || '0'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            tableElement.innerHTML = tableHTML;
+        }
+
+        // Display Back Orders Over 5 Days
+        function displayBackordersOver5(backorders) {
+            const titleElement = document.getElementById('backordersTitle');
+            const tableElement = document.getElementById('backordersTable');
+            
+            const count = backorders ? backorders.length : 0;
+            titleElement.textContent = `⚠️ Back Orders 5+ Days (${count} item${count !== 1 ? 's' : ''})`;
+            
+            if (!backorders || backorders.length === 0) {
+                tableElement.innerHTML = '<div class="empty-state" style="color: #94a3b8;">No back orders over 5 days! ✓</div>';
+                return;
+            }
+            
+            const getPriorityBadge = (priority) => {
+                const labels = {
+                    'critical': '🔴 30+ Days',
+                    'high': '🟠 15+ Days',
+                    'medium': '🟡 10+ Days',
+                    'normal': '🟢 5-9 Days'
+                };
+                return `<span class="priority-badge priority-${priority}">${labels[priority] || priority}</span>`;
+            };
+            
+            const tableHTML = `
+                <table class="parts-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">Age</th>
+                            <th>Part Number</th>
+                            <th>Customer</th>
+                            <th>Phone</th>
+                            <th>Status</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${backorders.map(item => `
+                            <tr>
+                                <td style="font-weight: 700; font-size: 16px;">${item.age}</td>
+                                <td><strong>${item.part_number}</strong></td>
+                                <td>${item.customer}</td>
+                                <td><a href="tel:${item.phone}" class="phone-link">${item.phone}</a></td>
+                                <td>${item.status}</td>
+                                <td>${getPriorityBadge(item.priority)}</td>
                             </tr>
                         `).join('')}
                     </tbody>
