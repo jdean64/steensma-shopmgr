@@ -279,6 +279,74 @@ def parse_open_back_orders(filepath):
         traceback.print_exc()
         return []
 
+def parse_backorders_over_5(filepath):
+    """
+    Parse Open Back Orders file for items 5+ days old
+    Extract customer contact info, part number, age, and status
+    """
+    try:
+        with open(filepath, 'r') as f:
+            content = f.read()
+        
+        backorders = []
+        lines = content.split('\n')
+        
+        for line in lines:
+            line = line.strip()
+            if not line or ',' not in line:
+                continue
+            
+            # Skip header lines
+            if 'Customer' in line or 'Steensma' in line or 'Invoice' in line:
+                continue
+            if 'Repair Orders' in line or 'Open Back Orders' in line:
+                continue
+            
+            # Check for back-ordered/on order status
+            if 'Back-Ordered' in line or 'On Order' in line:
+                parts = line.split(',')
+                
+                # Format: Customer,Phone,Part Number,Type,PP,Age,Ordered,Status,...
+                if len(parts) >= 9:
+                    customer = parts[0].strip()
+                    phone = parts[1].strip()
+                    part_number = parts[2].strip()
+                    age_str = parts[6].strip()  # Age is column 6 (0-indexed)
+                    status = parts[8].strip()   # Status is column 8 (0-indexed)
+                    
+                    # Try to parse age as integer
+                    try:
+                        age = int(age_str) if age_str else 0
+                    except ValueError:
+                        age = 0
+                    
+                    # Only include items 5+ days old
+                    if age >= 5 and part_number:
+                        # Use previous row's customer/phone if current row is blank
+                        if not customer and backorders:
+                            customer = backorders[-1]['customer']
+                            phone = backorders[-1]['phone']
+                        
+                        backorders.append({
+                            'customer': customer if customer else 'N/A',
+                            'phone': phone if phone else 'N/A',
+                            'part_number': part_number,
+                            'age': age,
+                            'status': status,
+                            'priority': 'critical' if age >= 30 else 'high' if age >= 15 else 'medium' if age >= 10 else 'normal'
+                        })
+        
+        # Sort by age descending (oldest first)
+        backorders.sort(key=lambda x: x['age'], reverse=True)
+        
+        return backorders
+    
+    except Exception as e:
+        print(f"Error parsing backorders over 5: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
+
 def parse_no_bins(filepath):
     """
     Parse No Bins file
@@ -686,7 +754,8 @@ def get_data():
             'labor': {'month': 0.0, 'ytd': 0.0},
             'targets': {'new_equipment': 795000.00, 'parts': 328000.00, 'labor': 250000.00}
         },
-        'no_bins': []
+        'no_bins': [],
+        'backorders_over_5': []
     }
     
     # Parse Shop Schedule
@@ -699,6 +768,7 @@ def get_data():
     # Parse Open Back Orders
     if backorders_file:
         data['parts_received'] = parse_open_back_orders(backorders_file)
+        data['backorders_over_5'] = parse_backorders_over_5(backorders_file)
     
     # Parse Gross Profit Mechanic
     if grossprofit_file:
