@@ -575,12 +575,12 @@
                         </div>
                     </div>
 
-                    <!-- Parts Received -->
+                    <!-- Back Ordered -->
                     <div class="section">
                         <div class="section-header">
                             <div class="section-title">
                                 <div class="section-icon">📦</div>
-                                Parts Received
+                                Back Ordered
                             </div>
                         </div>
                         <div class="parts-grid" id="partsReceived"></div>
@@ -1079,7 +1079,7 @@
             const partsYTD = Number(qs.parts?.ytd || 0);
             const laborYTD = Number(qs.labor?.ytd || 0);
             const totalYTD = newEquipYTD + partsYTD + laborYTD;
-            const targetAnnual = 7500000; // $7.5M annual goal
+            const targetAnnual = 6600000; // $6.6M annual goal
             
             const percentComplete = (totalYTD / targetAnnual) * 100;
             const currentMonth = new Date().getMonth() + 1; // 1-12
