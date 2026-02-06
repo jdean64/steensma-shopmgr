@@ -133,3 +133,47 @@ The application uses the following logic:
 ## Contact
 
 For issues or questions, contact the Steensma IT team.
+
+## Parts Management Features
+
+### No Bins Tracking
+Displays parts that need bin location assignments:
+- Automatically parses "No Bins - [DATE].txt" files from datasheets/
+- Shows: Line code, part number, description, available quantity
+- Expandable section in Parts Management area
+
+### Back Orders Over 5 Days
+Monitors overdue customer back orders with priority levels:
+- Automatically filters "Open Back Orders - [DATE].txt" for items >= 5 days old
+- **Priority Levels**:
+  - 🔴 Critical: 30+ days old
+  - 🟠 High: 15-29 days old
+  - 🟡 Medium: 10-14 days old
+  - 🟢 Normal: 5-9 days old
+- Shows: Customer name, phone, part number, age, status
+- Action required: Contact customers about delays
+
+### Purchase Orders Over 30 Days
+Tracks long-standing POs by vendor with priority indicators:
+- Automatically parses "PO Over 30 - [DATE].txt" for orders >= 30 days old
+- Grouped by vendor for efficient follow-up
+- **Priority Levels**:
+  - 🔴 Critical: 90+ days old
+  - 🟠 High: 60-89 days old
+  - 🟡 Medium: 45-59 days old
+  - 🟢 Normal: 30-44 days old
+- Shows: Vendor, PO number, age, status, date placed, item count, total amount
+- Action required: Vendor follow-up on delivery
+
+### Gross Profit YTD Tracker
+Annual progress monitoring against $7.5M goal:
+- Uses "Site Lead - [DATE].txt" quarterly sales data
+- Visual progress bar showing completion percentage
+- On-track/Behind pace indicator (compares actual vs. expected by month)
+- Breakdown by category:
+  - New Equipment YTD
+  - Parts YTD
+  - Labor YTD
+- Expected pace: ~8.33% per month, 16.7% by month 2, etc.
+
+All features auto-refresh with daily data file uploads.

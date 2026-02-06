@@ -47,7 +47,7 @@ The app runs continuously on the work laptop. Each time you upload new files:
 If you want to update the app code or targets from home:
 
 ### Via GitHub (No Terminal Needed):
-1. Go to https://github.com/jdean64/heirfinity
+1. Go to https://github.com/jdean64/steensma-shopmgr
 2. Click file to edit → Edit button (pencil icon)
 3. Make change (e.g., update bonus targets)
 4. Commit with description
@@ -76,7 +76,7 @@ git pull origin main
 ## Key Metrics Displayed
 
 ### Schedule
-- **Today's Jobs** - Derek, Chris, Brandon assignments
+- **Today's Jobs** - Dennis, Jake, Ray assignments
 - **Tomorrow's Jobs** - Lookahead
 - **Fit-Ins** - Same-day repairs
 - **House Account** - Internal work
@@ -131,7 +131,7 @@ cd /home/ubuntu/shopmgr && source venv/bin/activate && python app.py > /tmp/shop
 ## Updating Bonus Targets
 
 If Q1 targets change:
-1. Go to GitHub repo: https://github.com/jdean64/heirfinity
+1. Go to GitHub repo: https://github.com/jdean64/steensma-shopmgr
 2. Find `app.py` → Edit
 3. Search for `795000` and `328000`
 4. Update both values
@@ -185,7 +185,7 @@ To access work laptop from home:
 **Upload folder:** `/home/ubuntu/shopmgr/datasheets/`  
 **Dashboard URL (work):** `http://localhost:5001`  
 **Dashboard URL (home):** `https://shop.coresteensma.com`  
-**GitHub:** `https://github.com/jdean64/heirfinity`  
+**GitHub:** `https://github.com/jdean64/steensma-shopmgr`  
 **Current Q1 Targets:** Equipment $795,000 | Parts $328,000  
 **Auto-refresh:** Every 5 minutes  
 
@@ -200,3 +200,34 @@ To access work laptop from home:
 ✅ Minimal hands-on involvement  
 
 **You're good to go!**
+
+---
+
+## New Features Added (Feb 2026)
+
+### Parts Management Section
+Four expandable sections for proactive parts management:
+
+1. **📦 No Bins** - Parts that need to be binned
+   - Shows: Line code, part number, description, quantity available
+   - Action: Assign bin locations for these parts
+
+2. **⏳ Back Orders Over 5 Days** - Overdue customer back orders
+   - Priority levels: Critical (30+ days), High (15-29 days), Medium (10-14 days), Normal (5-9 days)
+   - Shows: Customer, phone, part, age, status
+   - Action: Contact customers about delayed parts
+
+3. **📋 PO Over 30 Days** - Long-standing purchase orders
+   - Grouped by vendor
+   - Priority levels: Critical (90+ days), High (60-89 days), Medium (45-59 days), Normal (30-44 days)
+   - Shows: Vendor name, PO number, age, status, items count
+   - Action: Follow up with vendors on delivery
+
+4. **📈 Gross Profit YTD** - Annual progress tracker
+   - Shows: Total YTD gross profit vs. $7.5M annual goal
+   - Progress bar with on-track/behind status indicator
+   - Breakdown: New Equipment, Parts, Labor YTD amounts
+   - Expected pace: Should be at ~16.7% by month 2
+
+All sections expand/collapse for easy navigation. Data auto-refreshes with daily file uploads.
+
