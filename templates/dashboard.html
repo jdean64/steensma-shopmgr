@@ -432,6 +432,63 @@
             font-size: 12px;
             color: #cbd5f5;
         }
+
+        /* Expandable Sections */
+        .expandable-section {
+            margin-top: 16px;
+            border: 1px solid #1e293b;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .expandable-header {
+            background: #0f172a;
+            padding: 14px 18px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.2s;
+        }
+        .expandable-header:hover {
+            background: #1e293b;
+        }
+        .expandable-header span {
+            font-weight: 600;
+            font-size: 15px;
+            color: #cbd5f5;
+        }
+        .toggle-icon {
+            transition: transform 0.3s;
+        }
+        .toggle-icon.expanded {
+            transform: rotate(180deg);
+        }
+        .expandable-content {
+            padding: 16px;
+            background: #111827;
+            border-top: 1px solid #1e293b;
+        }
+        .parts-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .parts-table th {
+            background: #0f172a;
+            padding: 10px;
+            text-align: left;
+            font-size: 13px;
+            color: #94a3b8;
+            border-bottom: 1px solid #1e293b;
+        }
+        .parts-table td {
+            padding: 10px;
+            font-size: 14px;
+            color: #cbd5f5;
+            border-bottom: 1px solid #1e293b;
+        }
+        .parts-table tr:hover {
+            background: #1e293b;
+        }
     </style>
 </head>
 <body>
@@ -522,6 +579,27 @@
                         <div class="value" id="overallEfficiency">--</div>
                     </div>
                 </div>
+
+                <!-- Parts Management Section -->
+                <div class="section">
+                    <div class="section-header">
+                        <div class="section-title">
+                            <div class="section-icon">📦</div>
+                            Parts Management
+                        </div>
+                    </div>
+                    
+                    <!-- No Bins -->
+                    <div class="expandable-section">
+                        <div class="expandable-header" onclick="toggleSection('noBinsContent')">
+                            <span id="noBinsTitle">📦 No Bins (0 items)</span>
+                            <span class="toggle-icon" id="noBinsToggle">▼</span>
+                        </div>
+                        <div class="expandable-content" id="noBinsContent" style="display: none;">
+                            <div id="noBinsTable"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -578,6 +656,9 @@
 
                 // Display Quarterly Sales
                 displayQuarterlySales(data.quarterly_sales);
+
+                // Display No Bins
+                displayNoBins(data.no_bins);
 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
@@ -746,6 +827,59 @@
             } catch (error) {
                 console.error('Error loading weather:', error);
             }
+        }
+
+        // Toggle expandable sections
+        function toggleSection(contentId) {
+            const content = document.getElementById(contentId);
+            const toggle = document.getElementById(contentId.replace('Content', 'Toggle'));
+            
+            if (content.style.display === 'none') {
+                content.style.display = 'block';
+                toggle.classList.add('expanded');
+            } else {
+                content.style.display = 'none';
+                toggle.classList.remove('expanded');
+            }
+        }
+
+        // Display No Bins
+        function displayNoBins(noBins) {
+            const titleElement = document.getElementById('noBinsTitle');
+            const tableElement = document.getElementById('noBinsTable');
+            
+            const count = noBins ? noBins.length : 0;
+            titleElement.textContent = `📦 No Bins (${count} item${count !== 1 ? 's' : ''})`;
+            
+            if (!noBins || noBins.length === 0) {
+                tableElement.innerHTML = '<div class="empty-state" style="color: #94a3b8;">All parts are binned! ✓</div>';
+                return;
+            }
+            
+            const tableHTML = `
+                <table class="parts-table">
+                    <thead>
+                        <tr>
+                            <th>Line Code</th>
+                            <th>Part Number</th>
+                            <th>Description</th>
+                            <th style="text-align: center;">Qty</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${noBins.map(item => `
+                            <tr>
+                                <td>${item.line_code || ''}</td>
+                                <td><strong>${item.part_number}</strong></td>
+                                <td>${item.description || ''}</td>
+                                <td style="text-align: center;">${item.available || '0'}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            tableElement.innerHTML = tableHTML;
         }
 
         // Initialize
