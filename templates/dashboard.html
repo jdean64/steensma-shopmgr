@@ -522,6 +522,56 @@
         .phone-link:hover {
             text-decoration: underline;
         }
+
+        /* ============================================
+           MOBILE RESPONSIVE STYLES
+           ============================================ */
+        
+        @media (max-width: 768px) {
+            .header { padding: 15px; flex-wrap: wrap; }
+            .header-title h1 { font-size: 20px; }
+            .header-subtitle { font-size: 11px; }
+            .weather { margin-top: 10px; width: 100%; justify-content: center; }
+            .container { padding: 15px; max-width: 100%; }
+            .dashboard-grid { grid-template-columns: 1fr !important; gap: 15px; }
+            .quarterly-grid { grid-template-columns: 1fr !important; }
+            .parts-grid { grid-template-columns: 1fr !important; }
+            .metrics-grid { grid-template-columns: 1fr !important; }
+            .section { padding: 15px; margin-bottom: 15px; }
+            .section-header { padding: 12px; }
+            .section-title { font-size: 16px; }
+            .section-icon { font-size: 18px; margin-right: 8px; }
+            .schedule-card, .quarterly-card, .mechanic-card, .part-card { padding: 12px; }
+            .quarterly-card h4 { font-size: 16px; }
+            .quarterly-values { grid-template-columns: 1fr 1fr !important; gap: 8px; }
+            .quarterly-value { padding: 10px; }
+            .quarterly-label { font-size: 10px; }
+            .quarterly-amount { font-size: 14px; }
+            .quarterly-target { font-size: 11px; }
+            .progress-text { font-size: 11px; }
+            .parts-table { display: block; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+            .parts-table table { min-width: 600px; }
+            .parts-table th, .parts-table td { padding: 8px; font-size: 12px; }
+            .priority-badge { padding: 3px 6px; font-size: 10px; }
+            .mechanic-card { flex-direction: column; align-items: flex-start; }
+            .mechanic-info h4 { font-size: 16px; }
+            .mechanic-stats { flex-direction: column; gap: 8px; width: 100%; }
+            .stat-label { font-size: 11px; }
+            .stat-value { font-size: 16px; }
+            .efficiency-badge { position: static; margin-top: 10px; align-self: flex-end; }
+            .expandable-header { padding: 12px; font-size: 14px; min-height: 44px; }
+            .expandable-content { padding: 12px; }
+            .empty-state { font-size: 13px; padding: 20px 15px; }
+            .stat-value.large { font-size: 32px !important; }
+        }
+        
+        @media (max-width: 480px) {
+            .header-title h1 { font-size: 18px; }
+            .quarterly-values { grid-template-columns: 1fr !important; }
+            .parts-table th, .parts-table td { padding: 6px; font-size: 11px; }
+            .section { padding: 12px; }
+            .schedule-card, .quarterly-card, .mechanic-card { padding: 10px; }
+        }
     </style>
 </head>
 <body>
