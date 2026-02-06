@@ -279,6 +279,57 @@ def parse_open_back_orders(filepath):
         traceback.print_exc()
         return []
 
+def parse_no_bins(filepath):
+    """
+    Parse No Bins file
+    Extract parts that need to be binned (no bin location assigned)
+    """
+    try:
+        with open(filepath, 'r') as f:
+            content = f.read()
+        
+        no_bins = []
+        lines = content.split('\n')
+        
+        # Skip header lines and footer
+        for line in lines:
+            line = line.strip()
+            
+            # Skip empty lines, headers, and footer
+            if not line or ',' not in line:
+                continue
+            if 'Steensma' in line or 'Bin Census' in line or 'Zone' in line:
+                continue
+            if 'Page' in line or ' of ' in line:
+                continue
+            
+            # Parse CSV format: ,Line Code,Part Number,O/C,Description,Class,Available
+            parts = line.split(',')
+            
+            # Must have at least 7 columns and start with empty bin (first column empty)
+            if len(parts) >= 7 and parts[0].strip() == '':
+                line_code = parts[1].strip()
+                part_number = parts[2].strip()
+                description = parts[4].strip()
+                available = parts[6].strip()
+                
+                # Skip if this is the header row
+                if part_number and part_number != 'Part Number':
+                    no_bins.append({
+                        'line_code': line_code,
+                        'part_number': part_number,
+                        'description': description,
+                        'available': available
+                    })
+        
+        return no_bins
+    
+    except Exception as e:
+        print(f"Error parsing no bins file: {e}")
+        import traceback
+        traceback.print_exc()
+        return []
+
 def parse_gross_profit_mechanic(filepath):
     """
     Parse Gross Profit Mechanic file
@@ -622,6 +673,7 @@ def get_data():
     backorders_file = get_latest_file('Open Back Orders')
     grossprofit_file = get_latest_file('Sales and Gross')
     quarterly_sales_file = find_quarterly_sales_file()
+    no_bins_file = get_latest_file('No Bins')
     
     data = {
         'timestamp': datetime.now().isoformat(),
@@ -633,7 +685,8 @@ def get_data():
             'parts': {'month': 0.0, 'ytd': 0.0},
             'labor': {'month': 0.0, 'ytd': 0.0},
             'targets': {'new_equipment': 795000.00, 'parts': 328000.00, 'labor': 250000.00}
-        }
+        },
+        'no_bins': []
     }
     
     # Parse Shop Schedule
@@ -654,6 +707,10 @@ def get_data():
     # Parse Quarterly Sales
     if quarterly_sales_file:
         data['quarterly_sales'] = parse_quarterly_sales(quarterly_sales_file)
+    
+    # Parse No Bins
+    if no_bins_file:
+        data['no_bins'] = parse_no_bins(no_bins_file)
     
     return jsonify(data)
 
