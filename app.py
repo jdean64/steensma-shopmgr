@@ -742,9 +742,9 @@ def parse_quarterly_sales(filepath):
         with open(filepath, 'r') as f:
             lines = [line.strip() for line in f.readlines()]
         
-        new_equipment = {'month': 0.0, 'ytd': 0.0}
-        parts_sales = {'month': 0.0, 'ytd': 0.0}
-        labor_sales = {'month': 0.0, 'ytd': 0.0}
+        new_equipment = {'month': 0.0, 'ytd': 0.0, 'py_month': 0.0, 'py_ytd': 0.0}
+        parts_sales = {'month': 0.0, 'ytd': 0.0, 'py_month': 0.0, 'py_ytd': 0.0}
+        labor_sales = {'month': 0.0, 'ytd': 0.0, 'py_month': 0.0, 'py_ytd': 0.0}
         
         import re
         
@@ -762,17 +762,23 @@ def parse_quarterly_sales(filepath):
         parts_vals = next_values_after('PARTS SALES')
         labor_vals = next_values_after('SERVICE LABOR SALES')
         
-        if len(new_vals) >= 2:
+        if len(new_vals) >= 4:
             new_equipment['month'] = parse_money(new_vals[0])
             new_equipment['ytd'] = parse_money(new_vals[1])
+            new_equipment['py_month'] = parse_money(new_vals[2])
+            new_equipment['py_ytd'] = parse_money(new_vals[3])
         
-        if len(parts_vals) >= 2:
+        if len(parts_vals) >= 4:
             parts_sales['month'] = parse_money(parts_vals[0])
             parts_sales['ytd'] = parse_money(parts_vals[1])
+            parts_sales['py_month'] = parse_money(parts_vals[2])
+            parts_sales['py_ytd'] = parse_money(parts_vals[3])
         
-        if len(labor_vals) >= 2:
+        if len(labor_vals) >= 4:
             labor_sales['month'] = parse_money(labor_vals[0])
             labor_sales['ytd'] = parse_money(labor_vals[1])
+            labor_sales['py_month'] = parse_money(labor_vals[2])
+            labor_sales['py_ytd'] = parse_money(labor_vals[3])
         
         # Q1 bonus targets
         new_equipment_target = 795000.00

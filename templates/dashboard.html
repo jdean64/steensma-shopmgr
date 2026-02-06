@@ -805,19 +805,49 @@
             const makeCard = (title, data, target) => {
                 const ytd = Number(data?.ytd || 0);
                 const month = Number(data?.month || 0);
+                const py_month = Number(data?.py_month || 0);
+                const py_ytd = Number(data?.py_ytd || 0);
                 const pct = target > 0 ? Math.min(100, (ytd / target) * 100) : 0;
+                
+                // Calculate comparisons
+                const vs_py_month = month - py_month;
+                const vs_py_ytd = ytd - py_ytd;
+                const vs_py_month_pct = py_month > 0 ? ((month - py_month) / py_month * 100) : 0;
+                const vs_py_ytd_pct = py_ytd > 0 ? ((ytd - py_ytd) / py_ytd * 100) : 0;
 
                 return `
                     <div class="quarterly-card">
                         <h4>${title}</h4>
                         <div class="quarterly-values">
                             <div class="quarterly-value">
-                                <div class="quarterly-label">Month</div>
+                                <div class="quarterly-label">MTD 2026</div>
                                 <div class="quarterly-amount">${formatMoney(month)}</div>
                             </div>
                             <div class="quarterly-value">
                                 <div class="quarterly-label">YTD 2026</div>
                                 <div class="quarterly-amount">${formatMoney(ytd)}</div>
+                            </div>
+                            <div class="quarterly-value">
+                                <div class="quarterly-label">MTD 2025</div>
+                                <div class="quarterly-amount" style="color: #94a3b8;">${formatMoney(py_month)}</div>
+                            </div>
+                            <div class="quarterly-value">
+                                <div class="quarterly-label">YTD 2025</div>
+                                <div class="quarterly-amount" style="color: #94a3b8;">${formatMoney(py_ytd)}</div>
+                            </div>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 10px 0; font-size: 12px;">
+                            <div style="background: #111827; padding: 8px; border-radius: 4px; border: 1px solid #1e293b;">
+                                <div style="color: #94a3b8; margin-bottom: 2px;">vs PY MTD</div>
+                                <div style="color: ${vs_py_month >= 0 ? '#22c55e' : '#ef4444'}; font-weight: 600;">
+                                    ${vs_py_month >= 0 ? '▲' : '▼'} ${formatMoney(Math.abs(vs_py_month))} (${vs_py_month_pct.toFixed(1)}%)
+                                </div>
+                            </div>
+                            <div style="background: #111827; padding: 8px; border-radius: 4px; border: 1px solid #1e293b;">
+                                <div style="color: #94a3b8; margin-bottom: 2px;">vs PY YTD</div>
+                                <div style="color: ${vs_py_ytd >= 0 ? '#22c55e' : '#ef4444'}; font-weight: 600;">
+                                    ${vs_py_ytd >= 0 ? '▲' : '▼'} ${formatMoney(Math.abs(vs_py_ytd))} (${vs_py_ytd_pct.toFixed(1)}%)
+                                </div>
                             </div>
                         </div>
                         <div class="quarterly-target">Q1 Bonus Target: ${formatMoney(target)}</div>
