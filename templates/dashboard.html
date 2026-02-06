@@ -643,6 +643,17 @@
                             <div id="backordersTable"></div>
                         </div>
                     </div>
+
+                    <!-- PO Over 30 Days -->
+                    <div class="expandable-section">
+                        <div class="expandable-header" onclick="toggleSection('poOver30Content')">
+                            <span id="poOver30Title">📋 PO Over 30 Days (0 items)</span>
+                            <span class="toggle-icon" id="poOver30Toggle">▼</span>
+                        </div>
+                        <div class="expandable-content" id="poOver30Content" style="display: none;">
+                            <div id="poOver30Table"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -706,6 +717,9 @@
 
                 // Display Back Orders Over 5
                 displayBackordersOver5(data.backorders_over_5);
+
+                // Display PO Over 30
+                displayPOOver30(data.po_over_30);
 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
@@ -972,6 +986,62 @@
                                 <td>${item.customer}</td>
                                 <td><a href="tel:${item.phone}" class="phone-link">${item.phone}</a></td>
                                 <td>${item.status}</td>
+                                <td>${getPriorityBadge(item.priority)}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+            
+            tableElement.innerHTML = tableHTML;
+        }
+
+        // Display PO Over 30 Days
+        function displayPOOver30(poData) {
+            const titleElement = document.getElementById('poOver30Title');
+            const tableElement = document.getElementById('poOver30Table');
+            
+            const count = poData ? poData.length : 0;
+            titleElement.textContent = `📋 PO Over 30 Days (${count} item${count !== 1 ? 's' : ''})`;
+            
+            if (!poData || poData.length === 0) {
+                tableElement.innerHTML = '<div class="empty-state" style="color: #94a3b8;">No POs over 30 days! ✓</div>';
+                return;
+            }
+            
+            const getPriorityBadge = (priority) => {
+                const labels = {
+                    'critical': '🔴 90+ Days',
+                    'high': '🟠 60+ Days',
+                    'medium': '🟡 30+ Days'
+                };
+                return `<span class="priority-badge priority-${priority}">${labels[priority] || priority}</span>`;
+            };
+            
+            const tableHTML = `
+                <table class="parts-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">Age</th>
+                            <th>Vendor</th>
+                            <th>PO Number</th>
+                            <th>Status</th>
+                            <th>Since</th>
+                            <th>Items</th>
+                            <th style="text-align: right;">Total</th>
+                            <th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${poData.map(item => `
+                            <tr>
+                                <td style="font-weight: 700; font-size: 16px;">${item.age}</td>
+                                <td><strong>${item.vendor}</strong></td>
+                                <td>${item.po_number}</td>
+                                <td>${item.status}</td>
+                                <td>${item.since}</td>
+                                <td style="text-align: center;">${item.items}</td>
+                                <td style="text-align: right;">${item.total}</td>
                                 <td>${getPriorityBadge(item.priority)}</td>
                             </tr>
                         `).join('')}
