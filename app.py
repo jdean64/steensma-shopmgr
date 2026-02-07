@@ -900,6 +900,23 @@ def get_weather():
     
     return jsonify({'temp': '--', 'condition': 'Unknown', 'icon': '113'})
 
+@app.route('/health')
+def health_check():
+    """Health check endpoint for monitoring"""
+    try:
+        # Verify we can access data directory
+        files_exist = os.path.exists(DATASHEETS_DIR)
+        return jsonify({
+            'status': 'healthy',
+            'timestamp': datetime.now().isoformat(),
+            'datasheets_accessible': files_exist
+        }), 200
+    except Exception as e:
+        return jsonify({
+            'status': 'unhealthy',
+            'error': str(e)
+        }), 503
+
 if __name__ == '__main__':
     # Create archive directory if it doesn't exist
     os.makedirs(ARCHIVE_DIR, exist_ok=True)
