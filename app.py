@@ -767,7 +767,7 @@ def parse_quarterly_sales(filepath):
                         if lines[j] and ',' in lines[j]:
                             # Extract money-like values with commas/decimals
                             # Split by comma and return values that look like money
-                            return [v.strip() for v in lines[j].split(',') if '.' in v and v.strip()]
+                            return re.findall(r'\(?\d{1,3}(?:,\d{3})*\.\d{2}\)?', lines[j])
             return []
         
         new_vals = next_values_after('NEW EQUIPMENT SALES')
@@ -830,7 +830,7 @@ def get_data():
     schedule_file = get_latest_file('Scheduled Shop Jobs')
     backorders_file = get_latest_file('Open Back Orders')
     grossprofit_file = get_latest_file('Sales and Gross')
-    quarterly_sales_file = find_quarterly_sales_file()
+    quarterly_sales_file = get_latest_file('Site Lead')
     no_bins_file = get_latest_file(['No Bins', 'No Bin'])
     po_over_30_file = get_latest_file('PO Over 30')
     
