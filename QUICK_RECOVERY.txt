@@ -1,0 +1,17 @@
+EMERGENCY RECOVERY - ONE COMMAND
+
+If the system crashes and you need to restore from GitHub, run this ONE command:
+
+cd /home/ubuntu/shopmgr && ./EMERGENCY_RECOVERY.sh
+
+Or if that doesn't exist yet:
+
+cd /home/ubuntu/shopmgr && git pull && source venv/bin/activate && pip install 'numpy<2' --force-reinstall && python app.py &
+
+
+WHAT THIS DOES:
+1. Pulls latest code from GitHub
+2. Fixes NumPy compatibility issue
+3. Starts the dashboard
+
+Then access: http://localhost:5001
