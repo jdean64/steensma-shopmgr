@@ -61,21 +61,10 @@ def parse_shop_schedule(filepath):
             }
             
             # Get today and tomorrow date strings
-            # Skip weekends - treat Monday as "today" if it's Sat/Sun
-            now = datetime.now()
-            if now.weekday() == 5:  # Saturday
-                today = now + timedelta(days=2)  # Monday
-                tomorrow = now + timedelta(days=3)  # Tuesday
-            elif now.weekday() == 6:  # Sunday
-                today = now + timedelta(days=1)  # Monday
-                tomorrow = now + timedelta(days=2)  # Tuesday
-            else:
-                today = now
-                tomorrow = now + timedelta(days=1)
-            
+            today = datetime.now()
+            tomorrow = today + timedelta(days=1)
             today_str = today.strftime('%-m/%-d/%Y')  # e.g., 1/15/2026
             tomorrow_str = tomorrow.strftime('%-m/%-d/%Y')
-
             
             lines = content.split('\n')
             current_mechanic = None
@@ -717,7 +706,7 @@ def find_quarterly_sales_file():
     # Check most recently modified files first (faster)
     txt_files_sorted = sorted(txt_files, key=os.path.getmtime, reverse=True)
     
-    # Check all files
+    # Check only the 5 most recent files to avoid reading all files
     for path in txt_files_sorted[:5]:
         try:
             with open(path, 'r') as f:
@@ -766,8 +755,7 @@ def parse_quarterly_sales(filepath):
                     for j in range(idx + 1, min(idx + 4, len(lines))):
                         if lines[j] and ',' in lines[j]:
                             # Extract money-like values with commas/decimals
-                            # Split by comma and return values that look like money
-                            return [v.strip() for v in lines[j].split(',') if '.' in v and v.strip()]
+                            return re.findall(r'\(?[\d,]+\.\d{2}\)?', lines[j])
             return []
         
         new_vals = next_values_after('NEW EQUIPMENT SALES')
@@ -831,7 +819,7 @@ def get_data():
     backorders_file = get_latest_file('Open Back Orders')
     grossprofit_file = get_latest_file('Sales and Gross')
     quarterly_sales_file = find_quarterly_sales_file()
-    no_bins_file = get_latest_file(['No Bins', 'No Bin'])
+    no_bins_file = get_latest_file('No Bins')
     po_over_30_file = get_latest_file('PO Over 30')
     
     data = {

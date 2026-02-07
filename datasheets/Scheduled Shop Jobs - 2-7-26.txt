@@ -1,0 +1,15 @@
+Steensma Lawn Plainwell361 12th st.Plainwell, MI  49080,
+Scheduled Shop Jobs
+Mechanics
+Invoice,Customer,Model,Description,Estimated Time,Start Time,End Time,Priority,Status
+FIT IN WORK
+1814958,Harold Zeigler Chrysler,93768,WHEN USING THE PLOW IT CAUSES THE DASH TO SHUT OFF/ BLINK OUT. THE PLOW WAS INSTALLED ON 1/28/26. SET UP IS GOING TO INSTALL THE DEFLECTOR FLAP. ,,2/9/2026,2/9/2026,097 - Residential ,CUSTOMER DROP
+p.HOUSE ACCOUNT
+1815306,VGHI Co.,TS420,Stop switch needs to be replaced. Air box screw doesn't thread properly. Please evaluate & advise,0:43,2/10/2026,2/10/2026,010 - Commercial ,Parts On-Order
+1815311,VGHI Co.,TS420,Stop switch needs to be replaced. Requires new primer bulb. Please evaluate & advise.,0:43,2/10/2026,2/10/2026,010 - Commercial ,Awaiting Start
+1815544,McCowen & Secord Funeral Home,HS720ASA,UNIT IS NOT THROWING SNOW. ENGINE IS RUNNING FINE. ,0:38,2/9/2026,2/9/2026,097 - Residential ,Awaiting Start
+1814318,HAVEN  CHURCH,997W72,REQUESTING FULL TUNE UP - HYDRO SERVICE IF NEEDED PER HOURS - WOULD LIKE FRONT TIRES CHANGED TO NO FLATS IF POSSIBLE & IF PRICE IS OK. WOULD LIKE FIVE EXTRA IGNITION KEYS ,2:40,2/9/2026,2/9/2026,097 - Residential ,PICK UP
+1814485,Chrissy Czlapinski,GT245W54,Lawn and Garden Tractor Tune-Up, 44" TO 72" Mower Deck, MAY NEED BLADES.,2:09,2/10/2026,2/10/2026,097 - Residential ,PICK UP
+Scheduled Shop Jobs - 2/7/2026 3:12 AM, Page,1,1
+ of
+1
