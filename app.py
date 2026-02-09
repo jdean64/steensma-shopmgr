@@ -816,6 +816,112 @@ def parse_quarterly_sales(filepath):
             'targets': {'new_equipment': 795000.00, 'parts': 328000.00, 'labor': 250000.00}
         }
 
+def parse_strategic_plan(filepath):
+    """
+    Parse Strategic Plan file with Quarterly Rocks,
+
+ Annual Goals, and Issues List
+    Format:
+    === QUARTERLY ROCKS (Q1 2026 - Due: 3/31/2026) ===
+    Rock description|Owner|Status
+    
+    === 2026 ANNUAL GOALS ===
+    MetricName|Target|Current
+    
+    === ISSUES LIST ===
+    IssueName|Priority
+    """
+    try:
+        with open(filepath, 'r') as f:
+            content = f.read()
+        
+        rocks = []
+        goals = []
+        issues = []
+        quarter_info = ''
+        
+        sections = content.split('===')
+        
+        # Iterate through sections, pair headers with their data
+        for i in range(len(sections)):
+            section = sections[i].strip()
+            if not section:
+                continue
+            
+            # Check if this is a header section
+            if 'QUARTERLY ROCKS' in section:
+                quarter_info = section
+                # Data is in the next section
+                if i + 1 < len(sections):
+                    data_section = sections[i + 1]
+                    lines = data_section.split('\n')
+                    for line in lines:
+                        line = line.strip()
+                        if line and '|' in line:
+                            parts = line.split('|')
+                            if len(parts) >= 3:
+                                rocks.append({
+                                    'description': parts[0].strip(),
+                                    'owner': parts[1].strip(),
+                                    'status': parts[2].strip()
+                                })
+            
+            # Annual Goals Section
+            elif 'ANNUAL GOALS' in section:
+                # Data is in the next section
+                if i + 1 < len(sections):
+                    data_section = sections[i + 1]
+                    lines = data_section.split('\n')
+                    for line in lines:
+                        line = line.strip()
+                        if line and '|' in line:
+                            parts = line.split('|')
+                            if len(parts) >= 3:
+                                try:
+                                    target = float(parts[1].strip())
+                                    current = float(parts[2].strip())
+                                    percent = (current / target * 100) if target > 0 else 0
+                                    goals.append({
+                                        'name': parts[0].strip(),
+                                        'target': target,
+                                        'current': current,
+                                        'percent': round(percent, 1)
+                                    })
+                                except:
+                                    pass
+            
+            # Issues List Section
+            elif 'ISSUES LIST' in section:
+                # Data is in the next section
+                if i + 1 < len(sections):
+                    data_section = sections[i + 1]
+                    lines = data_section.split('\n')
+                    for line in lines:
+                        line = line.strip()
+                        if line and '|' in line:
+                            parts = line.split('|')
+                            if len(parts) >= 2:
+                                issues.append({
+                                    'description': parts[0].strip(),
+                                    'priority': parts[1].strip()
+                                })
+        
+        return {
+            'quarter_info': quarter_info,
+            'rocks': rocks,
+            'goals': goals,
+            'issues': issues
+        }
+    
+    except Exception as e:
+        print(f"Error parsing strategic plan: {e}")
+        return {
+            'quarter_info': '',
+            'rocks': [],
+            'goals': [],
+            'issues': []
+        }
+
 
 @app.route('/')
 def index():
@@ -833,6 +939,7 @@ def get_data():
     quarterly_sales_file = get_latest_file('Site Lead')
     no_bins_file = get_latest_file(['No Bins', 'No Bin'])
     po_over_30_file = get_latest_file('PO Over 30')
+    strategic_plan_file = get_latest_file('Strategic Plan')
     
     data = {
         'timestamp': datetime.now().isoformat(),
@@ -847,7 +954,13 @@ def get_data():
         },
         'no_bins': [],
         'backorders_over_5': [],
-        'po_over_30': []
+        'po_over_30': [],
+        'strategic_plan': {
+            'quarter_info': '',
+            'rocks': [],
+            'goals': [],
+            'issues': []
+        }
     }
     
     # Parse Shop Schedule
@@ -877,6 +990,10 @@ def get_data():
     # Parse PO Over 30
     if po_over_30_file:
         data['po_over_30'] = parse_po_over_30(po_over_30_file)
+    
+    # Parse Strategic Plan
+    if strategic_plan_file:
+        data['strategic_plan'] = parse_strategic_plan(strategic_plan_file)
     
     return jsonify(data)
 

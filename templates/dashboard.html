@@ -490,6 +490,110 @@
             background: #1e293b;
         }
         
+        /* Strategic Dashboard Styles */
+        .rock-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left: 4px solid #ffffff;
+        }
+        .rock-item.complete {
+            border-left-color: #22c55e;
+            opacity: 0.7;
+        }
+        .rock-item.in-progress {
+            border-left-color: #3b82f6;
+        }
+        .rock-item.not-started {
+            border-left-color: #f59e0b;
+        }
+        .rock-description {
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            line-height: 1.4;
+        }
+        .rock-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .rock-owner {
+            background: rgba(255,255,255,0.2);
+            padding: 3px 8px;
+            border-radius: 4px;
+        }
+        .rock-status {
+            font-weight: 600;
+        }
+        .goal-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .goal-name {
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .goal-percent {
+            font-size: 20px;
+            font-weight: 700;
+        }
+        .goal-values {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            margin-bottom: 8px;
+            opacity: 0.9;
+        }
+        .goal-progress-bar {
+            background: rgba(255,255,255,0.2);
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        .goal-progress-fill {
+            background: linear-gradient(90deg, #22c55e 0%, #16a34a 100%);
+            height: 100%;
+            transition: width 0.5s ease;
+        }
+        .issue-item {
+            background: rgba(255,255,255,0.1);
+            border-radius: 8px;
+            padding: 12px;
+            font-size: 14px;
+        }
+        .issue-description {
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        .issue-priority {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: rgba(255,255,255,0.3);
+        }
+        .issue-priority.HIGH {
+            background: #dc2626;
+        }
+        .issue-priority.MEDIUM {
+            background: #f59e0b;
+        }
+        .issue-priority.LOW {
+            background: rgba(255,255,255,0.2);
+        }
+
         /* Priority badges */
         .priority-badge {
             display: inline-block;
@@ -601,6 +705,49 @@
             </div>
 
             <div id="dashboardContent" style="display: none;">
+                <!-- Strategic Dashboard Section -->
+                <div id="strategicSection" style="display: none;">
+                    <!-- Quarterly Rocks & Annual Goals Row -->
+                    <div class="dashboard-grid" style="margin-bottom: 20px;">
+                        <!-- Quarterly Rocks -->
+                        <div class="section" style="background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%); color: white;">
+                            <div class="section-header" style="border-bottom-color: rgba(255,255,255,0.2);">
+                                <div class="section-title" style="color: white;">
+                                    <div class="section-icon" style="background: rgba(255,255,255,0.2);">🎯</div>
+                                    <span id="quarterInfo">Quarterly Rocks</span>
+                                </div>
+                            </div>
+                            <div id="rocksContainer" style="max-height: 400px; overflow-y: auto;"></div>
+                        </div>
+
+                        <!-- Annual Goals -->
+                        <div class="section" style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); color: white;">
+                            <div class="section-header" style="border-bottom-color: rgba(255,255,255,0.2);">
+                                <div class="section-title" style="color: white;">
+                                    <div class="section-icon" style="background: rgba(255,255,255,0.2);">📊</div>
+                                    2026 Goals & Progress
+                                </div>
+                            </div>
+                            <div id="goalsContainer"></div>
+                        </div>
+                    </div>
+
+                    <!-- Issues List -->
+                    <div class="section" style="margin-bottom: 30px; background: linear-gradient(135deg, #991b1b 0%, #b91c1c 100%); color: white;">
+                        <div class="section-header" style="border-bottom-color: rgba(255,255,255,0.2);">
+                            <div class="section-title" style="color: white;">
+                                <div class="section-icon" style="background: rgba(255,255,255,0.2);">⚠️</div>
+                                Issues List
+                            </div>
+                        </div>
+                        <div id="issuesContainer" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px;"></div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div style="height: 2px; background: linear-gradient(90deg, #295B2A 0%, #4A7C4E 50%, #295B2A 100%); margin: 30px 0; border-radius: 2px;"></div>
+                    <h2 style="text-align: center; color: #1e293b; font-size: 24px; margin-bottom: 30px; font-weight: 700;">📅 Daily Operations</h2>
+                </div>
+
                 <!-- Schedule & Parts Row -->
                 <div class="dashboard-grid">
                     <!-- Shop Schedule -->
@@ -784,6 +931,9 @@
 
                 // Display Gross Profit YTD
                 displayGrossProfitYTD(data.quarterly_sales);
+
+                // Display Strategic Plan
+                displayStrategicPlan(data.strategic_plan);
 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
@@ -1219,6 +1369,104 @@
             `;
             
             chartElement.innerHTML = chartHTML;
+        }
+
+        function displayStrategicPlan(strategicPlan) {
+            if (!strategicPlan || (!strategicPlan.rocks.length && !strategicPlan.goals.length && !strategicPlan.issues.length)) {
+                document.getElementById('strategicSection').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('strategicSection').style.display = 'block';
+            
+            // Display Quarterly Rocks
+            const rocksContainer = document.getElementById('rocksContainer');
+            const quarterInfo = document.getElementById('quarterInfo');
+            
+            if (strategicPlan.quarter_info) {
+                quarterInfo.innerHTML = `🎯 ${strategicPlan.quarter_info}`;
+            }
+            
+            if (strategicPlan.rocks.length > 0) {
+                let rocksHTML = '';
+                strategicPlan.rocks.forEach(rock => {
+                    const statusClass = rock.status.replace(' ', '-').toLowerCase();
+                    const statusIcon = rock.status === 'COMPLETE' ? '✓' : 
+                                     rock.status === 'IN PROGRESS' ? '🔄' : '⏳';
+                    rocksHTML += `
+                        <div class="rock-item ${statusClass}">
+                            <div class="rock-description">${rock.description}</div>
+                            <div class="rock-meta">
+                                <span class="rock-owner">👤 ${rock.owner}</span>
+                                <span class="rock-status">${statusIcon} ${rock.status}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                rocksContainer.innerHTML = rocksHTML;
+            } else {
+                rocksContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity: 0.7;">No rocks defined</div>';
+            }
+            
+            // Display Annual Goals
+            const goalsContainer = document.getElementById('goalsContainer');
+            
+            if (strategicPlan.goals.length > 0) {
+                let goalsHTML = '';
+                strategicPlan.goals.forEach(goal => {
+                    const percentColor = goal.percent >= 100 ? '#22c55e' : 
+                                        goal.percent >= 80 ? '#3b82f6' :
+                                        goal.percent >= 50 ? '#f59e0b' : '#ef4444';
+                    
+                    const formatValue = (val) => {
+                        if (val >= 1000000) return `$${(val/1000000).toFixed(1)}M`;
+                        if (val >= 1000) return `${(val/1000).toFixed(0)}K`;
+                        return val.toFixed(0);
+                    };
+                    
+                    const displayTarget = goal.name === 'Revenue' || goal.name.includes('$') ? 
+                                        formatValue(goal.target) : goal.target.toFixed(0);
+                    const displayCurrent = goal.name === 'Revenue' || goal.name.includes('$') ? 
+                                         formatValue(goal.current) : goal.current.toFixed(0);
+                    
+                    goalsHTML += `
+                        <div class="goal-item">
+                            <div class="goal-name">
+                                <span>${goal.name}</span>
+                                <span class="goal-percent" style="color: ${percentColor}">${goal.percent}%</span>
+                            </div>
+                            <div class="goal-values">
+                                <span>Current: ${displayCurrent}</span>
+                                <span>Target: ${displayTarget}</span>
+                            </div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill" style="width: ${Math.min(goal.percent, 100)}%; background: ${percentColor};"></div>
+                            </div>
+                        </div>
+                    `;
+                });
+                goalsContainer.innerHTML = goalsHTML;
+            } else {
+                goalsContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity: 0.7;">No goals defined</div>';
+            }
+            
+            // Display Issues List
+            const issuesContainer = document.getElementById('issuesContainer');
+            
+            if (strategicPlan.issues.length > 0) {
+                let issuesHTML = '';
+                strategicPlan.issues.forEach(issue => {
+                    issuesHTML += `
+                        <div class="issue-item">
+                            <div class="issue-description">${issue.description}</div>
+                            <span class="issue-priority ${issue.priority}">${issue.priority}</span>
+                        </div>
+                    `;
+                });
+                issuesContainer.innerHTML = issuesHTML;
+            } else {
+                issuesContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity: 0.7;">No issues listed</div>';
+            }
         }
 
         // Initialize
