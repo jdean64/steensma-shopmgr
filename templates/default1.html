@@ -862,17 +862,6 @@
                             <div id="grossProfitChart"></div>
                         </div>
                     </div>
-
-                    <!-- EOS Strategic Planning -->
-                    <div class="expandable-section">
-                        <div class="expandable-header" onclick="toggleSection('eosContent')">
-                            <span id="eosTitle">🎯 EOS Strategic Plan</span>
-                            <span class="toggle-icon" id="eosToggle">▼</span>
-                        </div>
-                        <div class="expandable-content" id="eosContent" style="display: none;">
-                            <div id="eosStrategicPlan"></div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1383,96 +1372,101 @@
         }
 
         function displayStrategicPlan(strategicPlan) {
-            const container = document.getElementById('eosStrategicPlan');
-            
             if (!strategicPlan || (!strategicPlan.rocks.length && !strategicPlan.goals.length && !strategicPlan.issues.length)) {
-                container.innerHTML = '<div style="padding: 20px; text-align: center; opacity: 0.7;">No strategic plan data available</div>';
+                document.getElementById('strategicSection').style.display = 'none';
                 return;
             }
             
-            let html = '';
-            
-            // Quarter Info Header
-            if (strategicPlan.quarter_info) {
-                html += `
-                    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center;">
-                        <h3 style="margin: 0; font-size: 1.3rem;">🎯 ${strategicPlan.quarter_info}</h3>
-                    </div>
-                `;
-            }
+            document.getElementById('strategicSection').style.display = 'block';
             
             // Display Quarterly Rocks
+            const rocksContainer = document.getElementById('rocksContainer');
+            const quarterInfo = document.getElementById('quarterInfo');
+            
+            if (strategicPlan.quarter_info) {
+                quarterInfo.innerHTML = `🎯 ${strategicPlan.quarter_info}`;
+            }
+            
             if (strategicPlan.rocks.length > 0) {
-                html += '<div style="margin-bottom: 30px;">';
-                html += '<h4 style="color: #1e293b; margin-bottom: 15px; font-size: 1.1rem;">📍 Quarterly Rocks</h4>';
+                let rocksHTML = '';
                 strategicPlan.rocks.forEach(rock => {
-                    const statusClass = rock.status ? rock.status.toLowerCase().replace(' ', '-') : 'pending';
-                    const statusColor = rock.status && rock.status.toLowerCase() === 'complete' ? '#22c55e' : 
-                                      rock.status && rock.status.toLowerCase() === 'on track' ? '#3b82f6' : '#f59e0b';
-                    html += `
-                        <div class="rock-item" style="background: #f8fafc; border-left: 4px solid ${statusColor}; padding: 15px; margin-bottom: 12px; border-radius: 6px;">
-                            <div style="font-weight: 600; color: #1e293b; margin-bottom: 8px;">${rock.description}</div>
-                            <div style="display: flex; gap: 12px; font-size: 0.9rem; color: #64748b;">
-                                <span>👤 ${rock.owner}</span>
-                                <span style="color: ${statusColor}; font-weight: 600;">● ${rock.status}</span>
+                    const statusClass = rock.status.replace(' ', '-').toLowerCase();
+                    const statusIcon = rock.status === 'COMPLETE' ? '✓' : 
+                                     rock.status === 'IN PROGRESS' ? '🔄' : '⏳';
+                    rocksHTML += `
+                        <div class="rock-item ${statusClass}">
+                            <div class="rock-description">${rock.description}</div>
+                            <div class="rock-meta">
+                                <span class="rock-owner">👤 ${rock.owner}</span>
+                                <span class="rock-status">${statusIcon} ${rock.status}</span>
                             </div>
                         </div>
                     `;
                 });
-                html += '</div>';
+                rocksContainer.innerHTML = rocksHTML;
+            } else {
+                rocksContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity: 0.7;">No rocks defined</div>';
             }
             
             // Display Annual Goals
+            const goalsContainer = document.getElementById('goalsContainer');
+            
             if (strategicPlan.goals.length > 0) {
-                html += '<div style="margin-bottom: 30px;">';
-                html += '<h4 style="color: #1e293b; margin-bottom: 15px; font-size: 1.1rem;">🎯 Annual Goals</h4>';
+                let goalsHTML = '';
                 strategicPlan.goals.forEach(goal => {
-                    const current = parseFloat(goal.current) || 0;
-                    const target = parseFloat(goal.target) || 100;
-                    const percent = Math.min(100, Math.round((current / target) * 100));
-                    const percentColor = percent >= 100 ? '#22c55e' : 
-                                       percent >= 80 ? '#3b82f6' :
-                                       percent >= 50 ? '#f59e0b' : '#ef4444';
+                    const percentColor = goal.percent >= 100 ? '#22c55e' : 
+                                        goal.percent >= 80 ? '#3b82f6' :
+                                        goal.percent >= 50 ? '#f59e0b' : '#ef4444';
                     
-                    html += `
-                        <div class="goal-item" style="background: #f8fafc; padding: 15px; margin-bottom: 12px; border-radius: 6px;">
-                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
-                                <span style="font-weight: 600; color: #1e293b;">${goal.metric}</span>
-                                <span style="font-weight: 700; color: ${percentColor};">${percent}%</span>
+                    const formatValue = (val) => {
+                        if (val >= 1000000) return `$${(val/1000000).toFixed(1)}M`;
+                        if (val >= 1000) return `${(val/1000).toFixed(0)}K`;
+                        return val.toFixed(0);
+                    };
+                    
+                    const displayTarget = goal.name === 'Revenue' || goal.name.includes('$') ? 
+                                        formatValue(goal.target) : goal.target.toFixed(0);
+                    const displayCurrent = goal.name === 'Revenue' || goal.name.includes('$') ? 
+                                         formatValue(goal.current) : goal.current.toFixed(0);
+                    
+                    goalsHTML += `
+                        <div class="goal-item">
+                            <div class="goal-name">
+                                <span>${goal.name}</span>
+                                <span class="goal-percent" style="color: ${percentColor}">${goal.percent}%</span>
                             </div>
-                            <div style="display: flex; gap: 15px; font-size: 0.9rem; color: #64748b; margin-bottom: 8px;">
-                                <span>Current: ${goal.current}</span>
-                                <span>Target: ${goal.target}</span>
+                            <div class="goal-values">
+                                <span>Current: ${displayCurrent}</span>
+                                <span>Target: ${displayTarget}</span>
                             </div>
-                            <div style="width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden;">
-                                <div style="width: ${percent}%; height: 100%; background: ${percentColor}; transition: width 0.3s ease;"></div>
+                            <div class="goal-progress-bar">
+                                <div class="goal-progress-fill" style="width: ${Math.min(goal.percent, 100)}%; background: ${percentColor};"></div>
                             </div>
                         </div>
                     `;
                 });
-                html += '</div>';
+                goalsContainer.innerHTML = goalsHTML;
+            } else {
+                goalsContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity: 0.7;">No goals defined</div>';
             }
             
             // Display Issues List
+            const issuesContainer = document.getElementById('issuesContainer');
+            
             if (strategicPlan.issues.length > 0) {
-                html += '<div>';
-                html += '<h4 style="color: #1e293b; margin-bottom: 15px; font-size: 1.1rem;">⚠️ Issues List</h4>';
+                let issuesHTML = '';
                 strategicPlan.issues.forEach(issue => {
-                    const statusColor = issue.status && issue.status.toLowerCase() === 'resolved' ? '#22c55e' : '#ef4444';
-                    html += `
-                        <div class="issue-item" style="background: #fef2f2; border-left: 4px solid #ef4444; padding: 15px; margin-bottom: 12px; border-radius: 6px;">
-                            <div style="font-weight: 600; color: #1e293b; margin-bottom: 8px;">${issue.description}</div>
-                            <div style="display: flex; gap: 12px; font-size: 0.9rem; color: #64748b;">
-                                <span>👤 ${issue.owner}</span>
-                                <span style="color: ${statusColor}; font-weight: 600;">● ${issue.status}</span>
-                            </div>
+                    issuesHTML += `
+                        <div class="issue-item">
+                            <div class="issue-description">${issue.description}</div>
+                            <span class="issue-priority ${issue.priority}">${issue.priority}</span>
                         </div>
                     `;
                 });
-                html += '</div>';
+                issuesContainer.innerHTML = issuesHTML;
+            } else {
+                issuesContainer.innerHTML = '<div style="padding: 20px; text-align: center; opacity: 0.7;">No issues listed</div>';
             }
-            
-            container.innerHTML = html;
         }
 
         // Initialize

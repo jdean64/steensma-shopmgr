@@ -925,12 +925,17 @@ def parse_strategic_plan(filepath):
 
 @app.route('/')
 def index():
-    """Landing page with 4 summary cards"""
+    """Main shop operations dashboard"""
+    return render_template('dashboard.html')
+
+@app.route('/landing')
+def landing():
+    """Landing page with 4 summary cards (future use)"""
     return render_template('landing.html')
 
 @app.route('/shop')
 def shop():
-    """Detailed shop operations dashboard"""
+    """Detailed shop operations dashboard (future use)"""
     return render_template('shop.html')
 
 @app.route('/sales')
