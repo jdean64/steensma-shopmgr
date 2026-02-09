@@ -1,0 +1,16 @@
+[Unit]
+Description=Shop Manager Google Drive Sync
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/shopmgr
+ExecStart=/home/ubuntu/shopmgr/venv/bin/python3 /home/ubuntu/shopmgr/gdrive_sync.py
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

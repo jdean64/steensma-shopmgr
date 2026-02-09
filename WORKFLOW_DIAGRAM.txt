@@ -1,0 +1,171 @@
+
+                    SHOP MANAGER - EMAIL-TO-WEBSITE AUTOMATION
+                    ==========================================
+
+                                   THE WORKFLOW
+                                   ============
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 1: YOU (Create & Email)                                               │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      │ 1. Create report in Infinity
+                                      │ 2. Save to OneDrive/Documents/Plainwell/metrics/
+                                      │ 3. Open Outlook
+                                      │ 4. Email to: jdean64@gmail.com
+                                      │    Subject: "shopmgr"
+                                      │    Attach: Your Excel file
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 2: GMAIL (Automatic)                                          ⏱️ ~1 sec │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ • Email arrives with attachment                                             │
+│ • Gmail filter detects subject "shopmgr"                                    │
+│ • Gmail add-on/Zapier saves attachment → Google Drive                       │
+│   Location: gdrive:/shopmgr/                                                │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 3: GOOGLE DRIVE SYNC (Automatic)                         ⏱️ ~60 sec    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Service: shopmgr-gdrive-sync (gdrive_sync.py)                              │
+│                                                                             │
+│ • Checks gdrive:/shopmgr/ every 60 seconds                                  │
+│ • Detects new file                                                          │
+│ • Uses rclone to download:                                                  │
+│   gdrive:shopmgr/YourFile.xlsx → ~/shopmgr/datasheets/YourFile.xlsx        │
+│ • Logs activity to gdrive_sync.log                                          │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 4: FILE WATCHER (Automatic)                               ⏱️ ~2 sec    │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Service: shopmgr-file-watcher (file_watcher.py)                            │
+│                                                                             │
+│ • Detects new .xlsx file in ~/shopmgr/datasheets/                          │
+│ • Identifies file type:                                                     │
+│   - Shop Schedule → Scheduled Shop Jobs                                     │
+│   - Gross Profit → Sales and Gross                                          │
+│   - Open Back Orders → Open Back Orders                                     │
+│ • Archives original: ~/shopmgr/archive/2026-02-09/YourFile.xlsx            │
+│ • Converts to CSV: Scheduled Shop Jobs - 02-09-26.csv                      │
+│ • Saves in: ~/shopmgr/datasheets/                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                      │
+                                      ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ STEP 5: WEBSITE UPDATES (Automatic)                          ⏱️ Instant     │
+├─────────────────────────────────────────────────────────────────────────────┤
+│ Service: shop.coresteensma.com (app.py on port 5001)                       │
+│                                                                             │
+│ • Reads CSV files from ~/shopmgr/datasheets/                               │
+│ • Parses data and generates dashboard                                       │
+│ • Updates charts and tables                                                 │
+│ • Visitors see the new data immediately!                                    │
+│                                                                             │
+│ 🌐 https://shop.coresteensma.com                                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+
+
+                               TOTAL TIME: ~2 MINUTES
+                               ======================
+
+        From email sent → Data visible on website = ~90-120 seconds
+
+
+                                  FILE PATTERNS
+                                  =============
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║ Email Attachment Name       │ Converts To              │ Dashboard Section ║
+╠═══════════════════════════════════════════════════════════════════════════╣
+║ Shop Schedule               │ Scheduled Shop Jobs.csv  │ Shop Schedule     ║
+║ Feb Shop Report             │ Scheduled Shop Jobs.csv  │ Shop Schedule     ║
+║ Scheduled Shop Jobs         │ Scheduled Shop Jobs.csv  │ Shop Schedule     ║
+╟───────────────────────────────────────────────────────────────────────────╢
+║ Gross Profit                │ Sales and Gross.csv      │ Sales/Gross       ║
+║ Feb Gross Profit            │ Sales and Gross.csv      │ Sales/Gross       ║
+║ Sales and Gross             │ Sales and Gross.csv      │ Sales/Gross       ║
+╟───────────────────────────────────────────────────────────────────────────╢
+║ Open Back Orders            │ Open Back Orders.csv     │ Back Orders       ║
+║ Open ROs                    │ Open Back Orders.csv     │ Back Orders       ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+
+                                 MONITORING
+                                 ==========
+
+    Check if services are running:
+    $ sudo systemctl status shopmgr-gdrive-sync
+    $ sudo systemctl status shopmgr-file-watcher
+
+    View logs in real-time:
+    $ tail -f ~/shopmgr/gdrive_sync.log
+    $ sudo journalctl -u shopmgr-gdrive-sync -f
+
+    Check what files are in datasheets:
+    $ ls -lh ~/shopmgr/datasheets/
+
+    Manual sync test:
+    $ rclone copy gdrive:shopmgr ~/shopmgr/datasheets/ -v
+
+
+                              TROUBLESHOOTING
+                              ===============
+
+    Problem: Files not appearing in Google Drive
+    → Check Gmail filter is working
+    → Verify Gmail add-on/Zapier is configured
+    → Search Gmail for "label:ShopMgr"
+
+    Problem: Files in Google Drive but not downloading
+    → Check: sudo systemctl status shopmgr-gdrive-sync
+    → Check: tail ~/shopmgr/gdrive_sync.log
+    → Restart: sudo systemctl restart shopmgr-gdrive-sync
+
+    Problem: Files downloaded but not converted
+    → Check: sudo systemctl status shopmgr-file-watcher
+    → Verify filename matches pattern (see table above)
+    → Check file is .xlsx format (not .xls)
+
+    Problem: Website not updating
+    → Check CSV files exist: ls ~/shopmgr/datasheets/*.csv
+    → Restart website: sudo systemctl restart shopmgr (or relevant service)
+    → Check website logs
+
+
+                          SECURITY & MAINTENANCE
+                          ======================
+
+    ✅ Gmail filter only accepts from your trusted email
+    ✅ Google Drive folder is private (your drive only)
+    ✅ rclone uses OAuth (no passwords stored)
+    ✅ Original files archived (not deleted)
+    ✅ All activity logged
+
+    Cleanup old archives:
+    $ find ~/shopmgr/archive -type f -mtime +90 -delete  # Delete >90 days
+
+
+                           GMAIL SETUP HELPERS
+                           ===================
+
+    Gmail Add-ons that can save attachments to Drive:
+    • "Save Emails and Attachments" by cloudHQ
+    • "Email Attachments to Cloud" 
+    • "Backup and Sync for Gmail"
+
+    Or use Zapier/IFTTT:
+    Trigger: Gmail - New Email Matching Search (subject:shopmgr)
+    Action: Google Drive - Upload File
+    Folder: shopmgr
+
+
+═══════════════════════════════════════════════════════════════════════════════
+
+                    Questions? Run: ./QUICK_START_GDRIVE.sh
+                    Full Guide:     cat GDRIVE_SETUP_GUIDE.md
+
+═══════════════════════════════════════════════════════════════════════════════
