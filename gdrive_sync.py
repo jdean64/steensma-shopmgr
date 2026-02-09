@@ -142,6 +142,27 @@ def delete_from_gdrive(filename):
 # ============================================================================
 # Main Sync Logic
 # ============================================================================
+
+# ============================================================================
+# REPORT NAME FILTERS - Only download these 6 report types
+# ============================================================================
+ALLOWED_REPORTS = [
+    "No Bins",
+    "Open Back Orders",
+    "PO Over 30",
+    "Sales and Gross",
+    "Scheduled Shop Jobs",
+    "Site Lead"
+]
+
+def is_allowed_report(filename):
+    """Check if filename matches one of the 6 allowed report types"""
+    # Check if any of the allowed report names are in the filename
+    for report_name in ALLOWED_REPORTS:
+        if report_name in filename:
+            return True
+    return False
+
 def check_for_new_files():
     """Check Google Drive for new or modified files"""
     current_files = list_gdrive_files()
@@ -154,8 +175,12 @@ def check_for_new_files():
     
     # Find new or modified files
     for filename, mod_time in current_files.items():
-        # Only process Excel files
-        if not filename.endswith(('.xlsx', '.xls', '.csv')):
+        # Only process text/Excel files that match our report types
+        if not filename.endswith(('.txt', '.xlsx', '.xls', '.csv')):
+            continue
+        
+        # Filter: Only download the 6 specific report types
+        if not is_allowed_report(filename):
             continue
             
         if filename not in previous_state:

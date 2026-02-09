@@ -3,6 +3,8 @@ Steensma Shop Manager Dashboard
 Processes daily shop schedules, parts, and mechanic metrics
 """
 import os
+import csv
+import io
 from flask import Flask, render_template, jsonify
 from datetime import datetime, timedelta
 import pandas as pd
@@ -105,17 +107,36 @@ def parse_shop_schedule(filepath):
                 
                 # Parse job lines (contain comma-separated data)
                 if ',' in line and not line.startswith('Invoice,') and not line.startswith('Mechanics'):
-                    parts = line.split(',')
-                    if len(parts) >= 9:  # Must have all columns
+                    # Use CSV parser to handle commas within fields properly
+                    try:
+                        reader = csv.reader(io.StringIO(line))
+                        parts = next(reader)
+                    except:
+                        parts = line.split(',')  # Fallback to simple split
+                    
+                    if len(parts) >= 9:  # Must have at least 9 columns
                         invoice = parts[0]
                         customer = parts[1]
                         model = parts[2]
-                        description = parts[3]
-                        estimated_time = parts[4]
-                        start_time = parts[5]
-                        end_time = parts[6]
-                        priority = parts[7]
-                        status = parts[8]
+                        
+                        # Handle variable-length description fields
+                        # Last 5 fields are: estimated_time, start_time, end_time, priority, status
+                        # Everything between model and last 5 fields is description
+                        if len(parts) > 9:
+                            # Combine middle fields as description
+                            description = ', '.join(parts[3:-5])
+                            estimated_time = parts[-5]
+                            start_time = parts[-4]
+                            end_time = parts[-3]
+                            priority = parts[-2]
+                            status = parts[-1]
+                        else:
+                            description = parts[3]
+                            estimated_time = parts[4]
+                            start_time = parts[5]
+                            end_time = parts[6]
+                            priority = parts[7]
+                            status = parts[8]
                         
                         # Skip if no invoice number (likely not a job line)
                         if not invoice or not invoice.isdigit():
@@ -131,7 +152,14 @@ def parse_shop_schedule(filepath):
                         
                         # Only include if it's a fit-in or house account job
                         if in_fit_in_section and current_mechanic in ['Fit-In', 'House Account']:
-                            schedule_data['fit_ins'].append(job_data)
+                            # Compare start_time against today/tomorrow to categorize
+                            if start_time == today_str:
+                                schedule_data['today'].append(job_data)
+                            elif start_time == tomorrow_str:
+                                schedule_data['tomorrow'].append(job_data)
+                            else:
+                                # Falls back to fit_ins if date doesn't match today/tomorrow
+                                schedule_data['fit_ins'].append(job_data)
                         # Skip regular mechanic jobs (Derek, Chris, Brandon)
             
             return schedule_data
@@ -371,42 +399,52 @@ def parse_po_over_30(filepath):
         lines = content.split('\n')
         current_vendor = None
         
+        import re
+        po_line_pattern = re.compile(
+            r'^(?P<po_number>[^,]+),(?P<age>\d+),(?P<status>[^,]+),'
+            r'(?P<since>\d{2}/\d{2}/\d{2}),(?P<rest>.*)$'
+        )
+        money_pattern = re.compile(r'\(?\$?[\d,]+\.\d{2}\)?')
+        
         for line in lines:
             line = line.strip()
             if not line:
                 continue
             
             # Skip header lines
-            if 'Purchase Order' in line or 'Steensma' in line or 'Vendor Name' in line:
+            line_upper = line.upper()
+            if (
+                'PURCHASE ORDER AGING ANALYSIS' in line_upper
+                or 'STEENSMA' in line_upper
+                or 'VENDOR NAME' in line_upper
+            ):
                 continue
-            if 'PO Number' in line or 'Ordered' in line:
+            if 'PO NUMBER' in line_upper or 'ORDERED' in line_upper:
                 continue
-            
-            # Check if this is a vendor name line (no commas, or minimal structure)
-            parts = line.split(',')
-            
-            # Vendor lines typically have few columns or are standalone names
-            if len(parts) <= 2 and not line[0].isdigit():
-                # This is likely a vendor name
-                current_vendor = parts[0].strip()
+            if line.isdigit() or line.lower() == 'of':
                 continue
             
-            # PO lines have format: PO Number,Age,Status,Since,Return,Items,Pieces,Total,...
-            if len(parts) >= 8 and current_vendor:
-                po_number = parts[0].strip()
-                age_str = parts[1].strip()
-                status = parts[2].strip()
-                since = parts[3].strip()
-                items = parts[5].strip()
-                total = parts[7].strip()
+            # Parse PO lines using a regex so commas inside money values do not break columns.
+            po_match = po_line_pattern.match(line)
+            if po_match and current_vendor:
+                po_number = po_match.group('po_number').strip()
+                status = po_match.group('status').strip()
+                since = po_match.group('since').strip()
+                rest = po_match.group('rest')
                 
-                # Try to parse age
                 try:
-                    age = int(age_str) if age_str else 0
+                    age = int(po_match.group('age'))
                 except ValueError:
                     continue
                 
-                # Only include POs 30+ days old
+                # "rest" starts at Return,Items,... so items is normally field 2.
+                rest_parts = [p.strip() for p in rest.split(',')]
+                items = rest_parts[1] if len(rest_parts) > 1 else ''
+                
+                # First currency in the line is the ordered total.
+                money_match = money_pattern.search(rest)
+                total = money_match.group(0) if money_match else ''
+                
                 if age >= 30 and po_number:
                     po_data.append({
                         'vendor': current_vendor,
@@ -418,6 +456,11 @@ def parse_po_over_30(filepath):
                         'total': total,
                         'priority': 'critical' if age >= 90 else 'high' if age >= 60 else 'medium'
                     })
+                continue
+            
+            # Remaining non-header, non-PO lines are vendor headings.
+            if not line[0].isdigit():
+                current_vendor = line.split(',')[0].strip()
         
         # Sort by age descending (oldest first)
         po_data.sort(key=lambda x: x['age'], reverse=True)
