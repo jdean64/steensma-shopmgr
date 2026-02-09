@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parts Management - Plainwell</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            color: #4facfe;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .parts-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .parts-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #2d3748;
+            border-bottom: 3px solid #4facfe;
+            padding-bottom: 10px;
+        }
+        .parts-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .parts-table th {
+            background: #f7fafc;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+            color: #4a5568;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .parts-table td {
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .parts-table tr:hover {
+            background: #f7fafc;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .status-alert {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        .status-warning {
+            background: #feebc8;
+            color: #c05621;
+        }
+        .status-good {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-button">← Back to Dashboard</a>
+    
+    <div class="header">
+        <h1>📦 Parts Management</h1>
+        <p>CSR Parts Tracking & Inventory Status</p>
+    </div>
+    
+    <div class="content">
+        <!-- No Bins Section -->
+        <div class="parts-section">
+            <h2>🔍 No Bins</h2>
+            <table class="parts-table" id="noBinsTable">
+                <thead>
+                    <tr>
+                        <th>Part Number</th>
+                        <th>Description</th>
+                        <th>Customer</th>
+                        <th>Stock Number</th>
+                        <th>Days</th>
+                    </tr>
+                </thead>
+                <tbody id="noBinsBody">
+                    <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- PO Over 30 Section -->
+        <div class="parts-section">
+            <h2>📅 PO Over 30 Days</h2>
+            <table class="parts-table" id="poOver30Table">
+                <thead>
+                    <tr>
+                        <th>PO Number</th>
+                        <th>Part Number</th>
+                        <th>Description</th>
+                        <th>Vendor</th>
+                        <th>Days Outstanding</th>
+                    </tr>
+                </thead>
+                <tbody id="poOver30Body">
+                    <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- BO Over 5 Section -->
+        <div class="parts-section">
+            <h2>⏰ Backorders Over 5 Days</h2>
+            <table class="parts-table" id="boOver5Table">
+                <thead>
+                    <tr>
+                        <th>Part Number</th>
+                        <th>Description</th>
+                        <th>Customer</th>
+                        <th>Days Outstanding</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="boOver5Body">
+                    <tr><td colspan="5" class="empty-state">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    
+    <script>
+        async function loadPartsData() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                
+                // Display No Bins
+                displayNoBins(data.no_bins);
+                
+                // Display PO Over 30
+                displayPOOver30(data.po_over_30);
+                
+                // Display BO Over 5
+                displayBOOver5(data.backorders_over_5);
+                
+            } catch (error) {
+                console.error('Error loading parts data:', error);
+            }
+        }
+        
+        function displayNoBins(items) {
+            const tbody = document.getElementById('noBinsBody');
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">✅ No items without bins</td></tr>';
+                return;
+            }
+            
+            const html = items.map(item => `
+                <tr>
+                    <td>${item.part_number || 'N/A'}</td>
+                    <td>${item.description || 'N/A'}</td>
+                    <td>${item.customer || 'N/A'}</td>
+                    <td>${item.stock_number || 'N/A'}</td>
+                    <td><span class="status-badge status-alert">${item.days || 0} days</span></td>
+                </tr>
+            `).join('');
+            tbody.innerHTML = html;
+        }
+        
+        function displayPOOver30(items) {
+            const tbody = document.getElementById('poOver30Body');
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">✅ No POs over 30 days</td></tr>';
+                return;
+            }
+            
+            const html = items.map(item => `
+                <tr>
+                    <td>${item.po_number || 'N/A'}</td>
+                    <td>${item.part_number || 'N/A'}</td>
+                    <td>${item.description || 'N/A'}</td>
+                    <td>${item.vendor || 'N/A'}</td>
+                    <td><span class="status-badge status-alert">${item.days || 0} days</span></td>
+                </tr>
+            `).join('');
+            tbody.innerHTML = html;
+        }
+        
+        function displayBOOver5(items) {
+            const tbody = document.getElementById('boOver5Body');
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" class="empty-state">✅ No backorders over 5 days</td></tr>';
+                return;
+            }
+            
+            const html = items.map(item => {
+                const days = item.days_outstanding || 0;
+                const statusClass = days > 10 ? 'status-alert' : days > 7 ? 'status-warning' : 'status-good';
+                return `
+                    <tr>
+                        <td>${item.part_number || 'N/A'}</td>
+                        <td>${item.description || 'N/A'}</td>
+                        <td>${item.customer || 'N/A'}</td>
+                        <td><span class="status-badge ${statusClass}">${days} days</span></td>
+                        <td>${item.status || 'Pending'}</td>
+                    </tr>
+                `;
+            }).join('');
+            tbody.innerHTML = html;
+        }
+        
+        loadPartsData();
+    </script>
+</body>
+</html>

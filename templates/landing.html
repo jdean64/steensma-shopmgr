@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plainwell EOS Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 40px;
+        }
+        
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.95;
+        }
+        
+        .timestamp {
+            text-align: center;
+            color: white;
+            opacity: 0.9;
+            margin-bottom: 30px;
+            font-size: 0.95rem;
+        }
+        
+        .cards-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            padding: 0 20px;
+        }
+        
+        .dashboard-card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--card-color-1), var(--card-color-2));
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(0,0,0,0.2);
+        }
+        
+        .card-shop {
+            --card-color-1: #667eea;
+            --card-color-2: #764ba2;
+        }
+        
+        .card-sales {
+            --card-color-1: #f093fb;
+            --card-color-2: #f5576c;
+        }
+        
+        .card-parts {
+            --card-color-1: #4facfe;
+            --card-color-2: #00f2fe;
+        }
+        
+        .card-eos {
+            --card-color-1: #43e97b;
+            --card-color-2: #38f9d7;
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+        
+        .card-icon {
+            font-size: 2.5rem;
+            margin-right: 15px;
+        }
+        
+        .card-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .card-metrics {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        
+        .metric:last-child {
+            border-bottom: none;
+        }
+        
+        .metric-label {
+            font-size: 1rem;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2d3748;
+        }
+        
+        .metric-value.good {
+            color: #48bb78;
+        }
+        
+        .metric-value.warning {
+            color: #ed8936;
+        }
+        
+        .metric-value.alert {
+            color: #f56565;
+        }
+        
+        .card-footer {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 2px solid #e2e8f0;
+            text-align: center;
+            color: #718096;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        .loading {
+            text-align: center;
+            color: white;
+            font-size: 1.2rem;
+            padding: 40px;
+        }
+        
+        .error-message {
+            background: #fed7d7;
+            color: #c53030;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px auto;
+            max-width: 600px;
+            text-align: center;
+        }
+        
+        @media (max-width: 768px) {
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .card-title {
+                font-size: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🏢 Plainwell EOS Dashboard</h1>
+        <p>Company-Wide Performance Overview</p>
+    </div>
+    
+    <div class="timestamp" id="timestamp">Loading...</div>
+    
+    <div id="loading" class="loading">
+        Loading dashboard data...
+    </div>
+    
+    <div class="cards-container" id="cardsContainer" style="display: none;">
+        <!-- Shop Operations Card -->
+        <div class="dashboard-card card-shop" onclick="window.location.href='/shop'">
+            <div class="card-header">
+                <div class="card-icon">🔧</div>
+                <div class="card-title">Shop Operations</div>
+            </div>
+            <div class="card-metrics" id="shopMetrics">
+                <!-- Populated by JavaScript -->
+            </div>
+            <div class="card-footer">Click for detailed view →</div>
+        </div>
+        
+        <!-- Sales Performance Card -->
+        <div class="dashboard-card card-sales" onclick="window.location.href='/sales'">
+            <div class="card-header">
+                <div class="card-icon">📈</div>
+                <div class="card-title">Sales Performance</div>
+            </div>
+            <div class="card-metrics" id="salesMetrics">
+                <!-- Populated by JavaScript -->
+            </div>
+            <div class="card-footer">Click for detailed view →</div>
+        </div>
+        
+        <!-- Parts Management Card -->
+        <div class="dashboard-card card-parts" onclick="window.location.href='/parts'">
+            <div class="card-header">
+                <div class="card-icon">📦</div>
+                <div class="card-title">Parts Management</div>
+            </div>
+            <div class="card-metrics" id="partsMetrics">
+                <!-- Populated by JavaScript -->
+            </div>
+            <div class="card-footer">Click for detailed view →</div>
+        </div>
+        
+        <!-- EOS Strategic Card -->
+        <div class="dashboard-card card-eos" onclick="window.location.href='/eos'">
+            <div class="card-header">
+                <div class="card-icon">🎯</div>
+                <div class="card-title">EOS Strategic</div>
+            </div>
+            <div class="card-metrics" id="eosMetrics">
+                <!-- Populated by JavaScript -->
+            </div>
+            <div class="card-footer">Click for detailed view →</div>
+        </div>
+    </div>
+    
+    <script>
+        async function loadDashboard() {
+            try {
+                const response = await fetch('/api/summary');
+                const data = await response.json();
+                
+                // Update timestamp
+                document.getElementById('timestamp').textContent = 
+                    'Last Updated: ' + new Date(data.timestamp).toLocaleString();
+                
+                // Populate Shop Metrics
+                displayShopMetrics(data.shop);
+                
+                // Populate Sales Metrics
+                displaySalesMetrics(data.sales);
+                
+                // Populate Parts Metrics
+                displayPartsMetrics(data.parts);
+                
+                // Populate EOS Metrics
+                displayEOSMetrics(data.eos);
+                
+                // Show cards, hide loading
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('cardsContainer').style.display = 'grid';
+                
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('loading').innerHTML = 
+                    '<div class="error-message">Failed to load dashboard data. Please refresh the page.</div>';
+            }
+        }
+        
+        function displayShopMetrics(shop) {
+            const html = `
+                <div class="metric">
+                    <span class="metric-label">Today's Jobs</span>
+                    <span class="metric-value">${shop.today_jobs}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Tomorrow's Jobs</span>
+                    <span class="metric-value">${shop.tomorrow_jobs}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Parts Requests</span>
+                    <span class="metric-value ${shop.parts_requests > 10 ? 'alert' : shop.parts_requests > 5 ? 'warning' : 'good'}">${shop.parts_requests}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Team Efficiency</span>
+                    <span class="metric-value ${shop.efficiency >= 90 ? 'good' : shop.efficiency >= 75 ? 'warning' : 'alert'}">${shop.efficiency}%</span>
+                </div>
+            `;
+            document.getElementById('shopMetrics').innerHTML = html;
+        }
+        
+        function displaySalesMetrics(sales) {
+            const html = `
+                <div class="metric">
+                    <span class="metric-label">Monthly Revenue</span>
+                    <span class="metric-value">$${sales.monthly.toLocaleString()}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">YTD Revenue</span>
+                    <span class="metric-value">$${sales.ytd.toLocaleString()}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Target Achievement</span>
+                    <span class="metric-value ${sales.target_pct >= 100 ? 'good' : sales.target_pct >= 80 ? 'warning' : 'alert'}">${sales.target_pct}%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Top Category</span>
+                    <span class="metric-value" style="font-size: 1.2rem;">${sales.top_category}</span>
+                </div>
+            `;
+            document.getElementById('salesMetrics').innerHTML = html;
+        }
+        
+        function displayPartsMetrics(parts) {
+            const html = `
+                <div class="metric">
+                    <span class="metric-label">No Bins</span>
+                    <span class="metric-value ${parts.no_bins > 10 ? 'alert' : parts.no_bins > 5 ? 'warning' : 'good'}">${parts.no_bins}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">PO Over 30 Days</span>
+                    <span class="metric-value ${parts.po_over_30 > 5 ? 'alert' : parts.po_over_30 > 2 ? 'warning' : 'good'}">${parts.po_over_30}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">BO Over 5 Days</span>
+                    <span class="metric-value ${parts.bo_over_5 > 10 ? 'alert' : parts.bo_over_5 > 5 ? 'warning' : 'good'}">${parts.bo_over_5}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">OSS Items</span>
+                    <span class="metric-value">${parts.oss_items}</span>
+                </div>
+            `;
+            document.getElementById('partsMetrics').innerHTML = html;
+        }
+        
+        function displayEOSMetrics(eos) {
+            const html = `
+                <div class="metric">
+                    <span class="metric-label">Quarterly Rocks</span>
+                    <span class="metric-value">${eos.rocks_completed}/${eos.rocks_total}</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Rocks Progress</span>
+                    <span class="metric-value ${eos.rocks_pct >= 75 ? 'good' : eos.rocks_pct >= 50 ? 'warning' : 'alert'}">${eos.rocks_pct}%</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Annual Goals</span>
+                    <span class="metric-value">${eos.goals_on_track}/${eos.goals_total} on track</span>
+                </div>
+                <div class="metric">
+                    <span class="metric-label">Open Issues</span>
+                    <span class="metric-value ${eos.open_issues > 10 ? 'alert' : eos.open_issues > 5 ? 'warning' : 'good'}">${eos.open_issues}</span>
+                </div>
+            `;
+            document.getElementById('eosMetrics').innerHTML = html;
+        }
+        
+        // Load dashboard on page load
+        loadDashboard();
+        
+        // Refresh every 5 minutes
+        setInterval(loadDashboard, 300000);
+    </script>
+</body>
+</html>

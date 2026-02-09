@@ -925,8 +925,169 @@ def parse_strategic_plan(filepath):
 
 @app.route('/')
 def index():
-    """Main dashboard page"""
-    return render_template('dashboard.html')
+    """Landing page with 4 summary cards"""
+    return render_template('landing.html')
+
+@app.route('/shop')
+def shop():
+    """Detailed shop operations dashboard"""
+    return render_template('shop.html')
+
+@app.route('/sales')
+def sales():
+    """Detailed sales performance dashboard"""
+    return render_template('sales.html')
+
+@app.route('/parts')
+def parts():
+    """Detailed parts management dashboard"""
+    return render_template('parts.html')
+
+@app.route('/eos')
+def eos():
+    """Detailed EOS strategic planning dashboard"""
+    return render_template('eos.html')
+
+@app.route('/api/summary')
+def get_summary():
+    """API endpoint for landing page summary cards"""
+    
+    # Get latest files
+    schedule_file = get_latest_file('Scheduled Shop Jobs')
+    backorders_file = get_latest_file('Open Back Orders')
+    grossprofit_file = get_latest_file('Sales and Gross')
+    quarterly_sales_file = get_latest_file('Site Lead')
+    no_bins_file = get_latest_file(['No Bins', 'No Bin'])
+    po_over_30_file = get_latest_file('PO Over 30')
+    strategic_plan_file = get_latest_file('Strategic Plan')
+    
+    summary = {
+        'timestamp': datetime.now().isoformat(),
+        'shop': {
+            'today_jobs': 0,
+            'tomorrow_jobs': 0,
+            'parts_requests': 0,
+            'efficiency': 0
+        },
+        'sales': {
+            'monthly': 0,
+            'ytd': 0,
+            'target_pct': 0,
+            'top_category': 'N/A'
+        },
+        'parts': {
+            'no_bins': 0,
+            'po_over_30': 0,
+            'bo_over_5': 0,
+            'oss_items': 0
+        },
+        'eos': {
+            'rocks_total': 0,
+            'rocks_completed': 0,
+            'rocks_pct': 0,
+            'goals_total': 0,
+            'goals_on_track': 0,
+            'open_issues': 0
+        }
+    }
+    
+    # Calculate Shop metrics
+    try:
+        if schedule_file:
+            schedule = parse_shop_schedule(schedule_file)
+            summary['shop']['today_jobs'] = len(schedule.get('today', []))
+            summary['shop']['tomorrow_jobs'] = len(schedule.get('tomorrow', []))
+        
+        if backorders_file:
+            parts_received = parse_open_back_orders(backorders_file)
+            summary['shop']['parts_requests'] = len(parts_received)
+            summary['parts']['bo_over_5'] = len(parse_backorders_over_5(backorders_file))
+        
+        if grossprofit_file:
+            mechanic_data = parse_gross_profit_mechanic(grossprofit_file)
+            summary['shop']['efficiency'] = int(mechanic_data.get('overall_efficiency', 0))
+    except Exception as e:
+        print(f"Error calculating shop metrics: {e}")
+    
+    # Calculate Sales metrics
+    try:
+        if quarterly_sales_file:
+            sales_data = parse_quarterly_sales(quarterly_sales_file)
+            new_eq_month = sales_data['new_equipment']['month']
+            parts_month = sales_data['parts']['month']
+            labor_month = sales_data['labor']['month']
+            
+            new_eq_ytd = sales_data['new_equipment']['ytd']
+            parts_ytd = sales_data['parts']['ytd']
+            labor_ytd = sales_data['labor']['ytd']
+            
+            summary['sales']['monthly'] = int(new_eq_month + parts_month + labor_month)
+            summary['sales']['ytd'] = int(new_eq_ytd + parts_ytd + labor_ytd)
+            
+            # Calculate target achievement (using monthly as example)
+            total_target_monthly = (795000 + 328000 + 250000) / 12  # Annual targets divided by 12
+            if total_target_monthly > 0:
+                summary['sales']['target_pct'] = int((summary['sales']['monthly'] / total_target_monthly) * 100)
+            
+            # Determine top category
+            categories = {
+                'New Equipment': new_eq_month,
+                'Parts': parts_month,
+                'Labor': labor_month
+            }
+            summary['sales']['top_category'] = max(categories, key=categories.get)
+    except Exception as e:
+        print(f"Error calculating sales metrics: {e}")
+    
+    # Calculate Parts metrics
+    try:
+        if no_bins_file:
+            no_bins_data = parse_no_bins(no_bins_file)
+            summary['parts']['no_bins'] = len(no_bins_data)
+        
+        if po_over_30_file:
+            po_data = parse_po_over_30(po_over_30_file)
+            summary['parts']['po_over_30'] = len(po_data)
+        
+        # OSS items - would need a separate parser if available
+        summary['parts']['oss_items'] = 0  # Placeholder
+    except Exception as e:
+        print(f"Error calculating parts metrics: {e}")
+    
+    # Calculate EOS metrics
+    try:
+        if strategic_plan_file:
+            eos_data = parse_strategic_plan(strategic_plan_file)
+            rocks = eos_data.get('rocks', [])
+            goals = eos_data.get('goals', [])
+            issues = eos_data.get('issues', [])
+            
+            summary['eos']['rocks_total'] = len(rocks)
+            summary['eos']['rocks_completed'] = len([r for r in rocks if r.get('status', '').lower() == 'complete'])
+            
+            if summary['eos']['rocks_total'] > 0:
+                on_track = len([r for r in rocks if r.get('status', '').lower() in ['complete', 'on track']])
+                summary['eos']['rocks_pct'] = int((on_track / summary['eos']['rocks_total']) * 100)
+            
+            summary['eos']['goals_total'] = len(goals)
+            # Count goals as "on track" if current is >= 75% of target
+            goals_on_track = 0
+            for goal in goals:
+                try:
+                    current = float(goal.get('current', 0))
+                    target = float(goal.get('target', 1))
+                    if current >= (target * 0.75):
+                        goals_on_track += 1
+                except:
+                    pass
+            summary['eos']['goals_on_track'] = goals_on_track
+            
+            # Count open issues
+            summary['eos']['open_issues'] = len([i for i in issues if i.get('status', '').lower() != 'resolved'])
+    except Exception as e:
+        print(f"Error calculating EOS metrics: {e}")
+    
+    return jsonify(summary)
 
 @app.route('/api/data')
 def get_data():

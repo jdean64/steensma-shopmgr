@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EOS Strategic - Plainwell</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        .back-button {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: white;
+            color: #38f9d7;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transition: all 0.3s;
+        }
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0,0,0,0.2);
+        }
+        .content {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        .eos-section {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+        }
+        .eos-section h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: #2d3748;
+            border-bottom: 3px solid #43e97b;
+            padding-bottom: 10px;
+        }
+        .quarter-info {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .quarter-info h3 {
+            font-size: 1.5rem;
+            margin-bottom: 5px;
+        }
+        .rock-item, .goal-item, .issue-item {
+            background: #f7fafc;
+            border-left: 4px solid #43e97b;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+        .rock-item:hover, .goal-item:hover, .issue-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .rock-item h4, .goal-item h4, .issue-item h4 {
+            font-size: 1.1rem;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        .rock-meta, .goal-meta, .issue-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+        .meta-badge {
+            background: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+        .status-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        .status-complete {
+            background: #c6f6d5;
+            color: #2f855a;
+        }
+        .status-on-track {
+            background: #bee3f8;
+            color: #2c5282;
+        }
+        .status-at-risk {
+            background: #feebc8;
+            color: #c05621;
+        }
+        .status-open {
+            background: #fed7d7;
+            color: #c53030;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #43e97b, #38f9d7);
+            transition: width 0.3s ease;
+        }
+        .empty-state {
+            text-align: center;
+            padding: 40px;
+            color: #718096;
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-button">← Back to Dashboard</a>
+    
+    <div class="header">
+        <h1>🎯 EOS Strategic Planning</h1>
+        <p>Quarterly Rocks, Annual Goals, and Issues</p>
+    </div>
+    
+    <div class="content">
+        <div class="quarter-info" id="quarterInfo">
+            <h3>Loading...</h3>
+        </div>
+        
+        <!-- Rocks Section -->
+        <div class="eos-section">
+            <h2>🎯 Quarterly Rocks</h2>
+            <div id="rocksContainer">
+                <div class="empty-state">Loading...</div>
+            </div>
+        </div>
+        
+        <!-- Goals Section -->
+        <div class="eos-section">
+            <h2>📊 Annual Goals</h2>
+            <div id="goalsContainer">
+                <div class="empty-state">Loading...</div>
+            </div>
+        </div>
+        
+        <!-- Issues Section -->
+        <div class="eos-section">
+            <h2>⚠️ Issues List</h2>
+            <div id="issuesContainer">
+                <div class="empty-state">Loading...</div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        async function loadEOSData() {
+            try {
+                const response = await fetch('/api/data');
+                const data = await response.json();
+                const eos = data.strategic_plan;
+                
+                // Display quarter info
+                document.getElementById('quarterInfo').innerHTML = `<h3>${eos.quarter_info}</h3>`;
+                
+                // Display rocks
+                displayRocks(eos.rocks);
+                
+                // Display goals
+                displayGoals(eos.goals);
+                
+                // Display issues
+                displayIssues(eos.issues);
+                
+            } catch (error) {
+                console.error('Error loading EOS data:', error);
+            }
+        }
+        
+        function displayRocks(rocks) {
+            const container = document.getElementById('rocksContainer');
+            if (!rocks || rocks.length === 0) {
+                container.innerHTML = '<div class="empty-state">No rocks defined</div>';
+                return;
+            }
+            
+            const html = rocks.map(rock => {
+                const statusClass = rock.status === 'Complete' ? 'status-complete' :
+                                  rock.status === 'On Track' ? 'status-on-track' : 'status-at-risk';
+                return `
+                    <div class="rock-item">
+                        <h4>${rock.description}</h4>
+                        <div class="rock-meta">
+                            <span class="meta-badge">👤 ${rock.owner}</span>
+                            <span class="status-badge ${statusClass}">${rock.status}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            container.innerHTML = html;
+        }
+        
+        function displayGoals(goals) {
+            const container = document.getElementById('goalsContainer');
+            if (!goals || goals.length === 0) {
+                container.innerHTML = '<div class="empty-state">No goals defined</div>';
+                return;
+            }
+            
+            const html = goals.map(goal => {
+                const current = parseFloat(goal.current) || 0;
+                const target = parseFloat(goal.target) || 100;
+                const progress = Math.min(100, Math.round((current / target) * 100));
+                return `
+                    <div class="goal-item">
+                        <h4>${goal.metric}</h4>
+                        <div class="goal-meta">
+                            <span class="meta-badge">🎯 Target: ${goal.target}</span>
+                            <span class="meta-badge">📊 Current: ${goal.current}</span>
+                            <span class="meta-badge">📈 Progress: ${progress}%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${progress}%"></div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            container.innerHTML = html;
+        }
+        
+        function displayIssues(issues) {
+            const container = document.getElementById('issuesContainer');
+            if (!issues || issues.length === 0) {
+                container.innerHTML = '<div class="empty-state">✅ No open issues</div>';
+                return;
+            }
+            
+            const html = issues.map(issue => `
+                <div class="issue-item">
+                    <h4>${issue.description}</h4>
+                    <div class="issue-meta">
+                        <span class="meta-badge">👤 ${issue.owner}</span>
+                        <span class="status-badge status-open">${issue.status}</span>
+                    </div>
+                </div>
+            `).join('');
+            container.innerHTML = html;
+        }
+        
+        loadEOSData();
+    </script>
+</body>
+</html>
