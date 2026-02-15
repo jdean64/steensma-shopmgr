@@ -1,0 +1,55 @@
+Scheduled Shop Jobs
+Steensma Lawn Plainwell361 12th st.Plainwell, MI  49080,
+Mechanics
+Invoice,Customer,Model,Description,Estimated Time,Start Time,End Time,Priority,Status
+FIT IN WORK
+1813141,MARY PHELPS,*,NOTICED AN OIL LEAK - SEE IT ON FRONT AXLE, ON LOWER RADIATOR HOSE(S), & RADIATOR PUMP BELT - CAN'T TELL WHERE IT'S COMING FROM EXACTLY - NOT SURE IF IT'S ENGINE OIL OR TRANSMISSION OIL. PLEASE EVAL & ADVISE. SEE F5 NOTES,4:25,2/12/2026,2/12/2026,097 - Residential ,Awaiting Start
+1816508,ALLEGAN COUNTY FACILITIES MGMT,47 2STAGE SHAFT DRIVE,BEARINGS ON THE DRIVE SHAFT HOLDER AT THE FRONT HITCH WENT OUT. PLEASE REPLACE. THE PTO SHUTS OFF WHEN BACKING UP ASWELL. ,1:55,2/12/2026,2/12/2026,010 - Commercial ,Awaiting Start
+p.HOUSE ACCOUNT
+1816567,C. Stoddard & Sons,X754,Customer was moving mower and deck separated from tractor. Believes that there is a missing pin. Please evaluate & advise. Would like a tune up and hydro service as well. Please find correct engine code.,4:07,2/12/2026,2/12/2026,097 - Residential ,Awaiting Start
+1814190,CARSON CROSS,X390W48,CUST HIT A LOG. NOW THE AUGER AND IMPELLER WILL NOT SPIN. THEY WILL SPIN WHEN THERE IS NOT A LOAD. CUST HAS CHECKED THE SHEAR PINS. WOULD ALSO LIKE A TUNE UP.,2:56,2/12/2026,2/12/2026,097 - Residential ,CUSTOMER DROP
+1814318,HAVEN  CHURCH,997W72,REQUESTING FULL TUNE UP - HYDRO SERVICE IF NEEDED PER HOURS - WOULD LIKE FRONT TIRES CHANGED TO NO FLATS IF POSSIBLE & IF PRICE IS OK. WOULD LIKE FIVE EXTRA IGNITION KEYS ,2:40,2/12/2026,2/12/2026,097 - Residential ,Awaiting Start
+1814485,Chrissy Czlapinski,GT245W54,Lawn and Garden Tractor Tune-Up, 44" TO 72" Mower Deck, MAY NEED BLADES.,2:09,2/12/2026,2/12/2026,097 - Residential ,Awaiting Start
+1815306,VGHI Co.,TS420,Stop switch needs to be replaced. Air box screw doesn't thread properly. Please evaluate & advise,0:43,2/12/2026,2/12/2026,010 - Commercial ,Parts On-Order
+1815540,CHRIS SHARPE,38454,Unit has not run for two seasons. Has old gas in it. Please evaluate & advise.,0:38,2/12/2026,2/12/2026,097 - Residential ,CUSTOMER DROP
+1813589,ALLEGAN COUNTY PARKS & REC,X580W54A,Lawn and Garden Tractor Tune-Up, 44" TO 72" Mower Deck,2:09,2/12/2026,2/12/2026,010 - Commercial ,Awaiting Start
+1811841,Colleen Ritchie,2 STAGE SNOWBLOWER,AUGER CABLE HAS SNAPPED - NEEDS REPLACED. WOULD LIKE TUNE UP AS WELL.,2:23,2/12/2026,2/12/2026,097 - Residential ,Awaiting Start
+pBrandon Wallace
+1813655,Steensma Lawn and Power Equip.,.,JANUARY 2026 INTERNAL TIME CARD ,,2/12/2026,2/12/2026,070 - SMR ,In-Progress
+3
+ of
+Scheduled Shop Jobs - 2/12/2026 3:37 AM, Page,1,3
+Mechanics
+Invoice,Customer,Model,Description,Estimated Time,Start Time,End Time,Priority,Status
+1760472,Cliff Runkle,RM3674,Off Season Storage Tune up with P&D ,2:24,2/12/2026,2/12/2026,080 - WINTER STORAGE,Awaiting OK
+1815544,McCowen & Secord Funeral Home,HS720ASA,UNIT IS NOT THROWING SNOW. ENGINE IS RUNNING FINE. ,2:28,2/12/2026,2/12/2026,097 - Residential ,Parts On-Order
+1815311,VGHI Co.,TS420,Stop switch needs to be replaced. Requires new primer bulb. Please evaluate & advise.,3:58,2/12/2026,2/12/2026,010 - Commercial ,Awaiting OK
+1816084,KEN COBURN,GATOR 835M CAMO,REPLACE OIL PAN. REPLACE THE DRIVERS SIDE LABEL IN SET UP.,0:00,2/12/2026,2/12/2026,097 - Residential ,In-Progress
+1811265,BRONCO ASPHALT MAINT,38630,CUSTOMER THINKS IMPELLER BEARING IS BAD AND NEEDS TO BE REPLACED,3:03,2/12/2026,2/12/2026,010 - Commercial ,Parts On-Order
+1816276,Margo Rebar ,HRX2175VKA,TUNE UP FOR THE SUMMER,0:54,2/12/2026,2/12/2026,097 - Residential ,In-Progress
+pCHRIS DEMANN
+1816744,Jeff Terpstra,2025RwR4TLB,CUSTOMER WOULD LIKE BATTERY REPLACED ON THE UNIT.. ,1:00,2/12/2026,2/12/2026,097 - Residential ,Awaiting Start
+1805066,RON MEJEUR,X540W54X,Customer states the oil light is coming on. Customer changed engine oil and filter, no change.  Suspects it may be the low oil sensor, but may also be the oil pump. Please evaluate & advise.,5:47,2/12/2026,2/12/2026,097 - Residential ,Parts On-Order
+1760199,Ryan Adolph,L110,Off Season Storage Tune up with P&D - Customer states he has had a hard time starting. On going problem later part of the season. Once it starts, it is fine Please evaluate & advise. ,6:17,2/12/2026,2/12/2026,080 - WINTER STORAGE,Awaiting OK
+1781369,MARK BOUMAN,Z445,Off Season storage Tune Up Customer drop off - states running a little rough. Not cold weather related in his opinion. Please evaluate & advise.,2:56,2/12/2026,2/12/2026,080 - WINTER STORAGE,Awaiting OK
+1801941,NEIL POHL,Z445,Customer states unit has an oil leak. Thought it was a small leak until loading it on the trailer. Not sure where/why its leaking. Pending inspection would like a full service tune up. Please evaluate & advise.Per customer we can run unit.,6:47,2/12/2026,2/12/2026,097 - Residential ,Parts On-Order
+1804297,RICKY EUSTICE,4200,Axle has what the customer is calling freeze caps are off and the axle has no fluid. Fluid is chocolate brown on floor. Says he has sign signs of oil weeping. May need more service to the axle area in general.,43:39,2/12/2026,2/12/2026,097 - Residential ,Parts On-Order
+1813657,Steensma Lawn and Power Equip.,.,JANUARY 2026 INTERNAL TIME CARD ,,2/12/2026,2/12/2026,070 - SMR ,In-Progress
+1811007,ROGER ZIMMERMAN,2320H,DRIVE SHAFT BROKE OR SOMETHING CAME LOOSE. HITTING THE FOOT REST BAD.,1:55,2/12/2026,2/12/2026,070 - SMR ,Parts On-Order
+pDerek Snyder
+1806738,DONALD COUCH,Z530Mw54A,CUSTOMER WOULD LIKE WINTER STORAGE AND SERVICE,2:29,2/12/2026,2/12/2026,080 - WINTER STORAGE,Parts On-Order
+3
+ of
+Scheduled Shop Jobs - 2/12/2026 3:37 AM, Page,2,3
+Mechanics
+Invoice,Customer,Model,Description,Estimated Time,Start Time,End Time,Priority,Status
+1761299,TIM CLANCY ,17AIDGHD010,Off Season Storage Tune up with P&D - UNIT IS HAVING A HARD TIME IN REVERSE, VERY WEAK, STILL HAS ONGOING FUEL ISSUES, THINKS FUEL IS ONLY BEING USED FROM ONE TANK. SEE PAST WORK.,9:28,2/12/2026,2/12/2026,080 - WINTER STORAGE,In-Progress
+1813656,Steensma Lawn and Power Equip.,.,JANUARY 2026 INTERNAL TIME CARD ,,2/12/2026,2/12/2026,070 - SMR ,In-Progress
+1804342,AWESOME LAWNS,WBSB4430,THE WHEELS HAVE LOCKED UP AND WOULDN'T SPIN. HE MESSED WITH THE SHIFT LEVER AND IT SPUN FREELY BUT HEARD CLICKING. THE ENGINE IS ALSO SURGING. PLEASE DIAGNOSE AND ADVISE. ,5:07,2/12/2026,2/12/2026,070 - SMR ,Parts On-Order
+1807129,HAMILTON COMM. SCHOOLS,LZX801GKA606B1,THE RIGHT SIDE HYDRO IS LACKING POWER. ON FLAT GROUND IT WILL DRIVE STRAIGHT, BUT ON HILLS IT WILL DRIFT. THEY HAVE LOOKED IT OVER AND CANT SEE ANYTHING WRONG. THEY HAVE RECANLTY DID THE HYDRO SERVICE AND DIDN'T FIND ANYTHING IN THE OIL. ,7:50,2/12/2026,2/12/2026,010 - Commercial ,Awaiting OK
+1811067,RANDY BROWN,X300W42X,Unit will not start. Tried jumping before purchasing a new battery. Unit only hums when the key is turned. Hummed when jumped. Hummed with new battery. Last time it ran properly 01/23. Please evaluate & advise.,7:41,2/12/2026,2/12/2026,097 - Residential ,In-Progress
+1814472,Mark Whited,37798,CUSTOMER STATES SNOW BLOWER RUNS FINE BUT WILL NOT BLOW ANY SNOW SAW A PART ON GROUND NOT SURE WHAT BROKEN,2:42,2/12/2026,2/12/2026,097 - Residential ,Awaiting OK
+1814958,FRAN ANDREWS,93768,WHEN USING THE PLOW IT CAUSES THE DASH TO SHUT OFF/ BLINK OUT. THE PLOW WAS INSTALLED ON 1/28/26. SET UP IS GOING TO INSTALL THE DEFLECTOR FLAP. ,,2/12/2026,2/12/2026,097 - Residential ,Other 
+Scheduled Shop Jobs - 2/12/2026 3:37 AM, Page,3,3
+ of
+3

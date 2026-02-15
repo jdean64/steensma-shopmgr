@@ -1,0 +1,57 @@
+Steensma Lawn Plainwell361 12th st.Plainwell, MI  49080,Open Back Orders
+By CustomerInclude: R/O's
+Invoice
+Customer,Phone ,Part Number,Type,PP,Age,Ordered,Status,Available,Allocated,PO 
+Repair Orders
+AWESOME LAWNS,(616) 308-0946,TORP - 121-0080,0,RO,X,27,1,Released for Payment,0,1,200-5883
+,,TORP - 133-1533,0,RO,X,27,1,Released for Payment,0,1,200-5883
+,,TORP - 133-1534,0,RO,X,27,1,Released for Payment,0,1,200-5883
+BRONCO ASPHALT MAINT,(269) 384-9816,TORP - 252-80,0,RO,X,13,1,Released for Payment,0,1,200-5907
+,,TORP - 106-4588-01,0,RO,X,13,2,Released for Payment,0,2,200-5907
+,,TORP - 94-8812,0,RO,X,13,1,Back-Ordered,0,0,200-5907
+,,TORP - 63-3450,0,RO,X,13,1,Released for Payment,0,1,200-5907
+,,TORP - 26-6120,0,RO,X,13,1,Released for Payment,0,1,200-5907
+,,TORP - 26-6110,0,RO,X,13,1,Released for Payment,0,1,200-5907
+Colleen Ritchie,(269) 303-9272,TORP - 161-0972,0,RO,X,14,1,Back-Ordered,0,0,200-5904
+DON KOLUDROVICH,(269) 209-0111,KAWP - 59011-2059,0,RO,X,19,1,Released for Payment,0,1,137-507
+DONALD COUCH,(810) 577-0517,JOHP - UC21007,0,RO,X,5,1,Back-Ordered,0,0,128-90962
+Generator Service Vehicles,(269) 685-9557,GECP - 0K3717,0,RO,X,22,3,On Order,0,0,108-4192
+,,MISP - 2049,0,RO,X,5,1,Pending,0,0,
+JACK CARLSON,(269) 209-0761,GECP - 0J9465,0,RO,X,7,1,Received,0,1,108-4200
+,,GECP - 0C5943,0,RO,X,7,1,Received,0,1,108-4200
+,,GECP - 10000038341,0,RO,X,7,1,Received,0,1,108-4200
+KEN COBURN,(269) 806-8684,JOHP - UC32065,0,RO,X,2,1,On Order,0,0,128-90970
+MARY PHELPS,(269) 364-1318,JOHP - DZ118732,0,RO,X,9,1,Released for Payment,0,1,128-90941
+McCowen & Secord Funeral Home,(269) 685-5881,HONP - 06720-V10-030,0,RO,X,2,1,Pending,0,0,
+NEIL POHL,(269) 217-4158,JOHP - MIU12142,0,RO,X,2,3,On Order,0,0,128-90970
+,,JOHP - MIU12153,0,RO,X,2,1,On Order,0,0,128-90970
+RANDY BROWN,(269) 569-6857,JOHP - MIA12926,0,RO,X,6,1,Released for Payment,0,1,128-90956
+RICHARD RUNOWSKI,(616) 218-8376,MISP - 9SV-GS02Q,0,RO,X,6,1,Released for Payment,0,1,47-228
+RICK HINCKLEY,(616) 292-2675,GECP - 0E9406,0,RO,X,1,1,On Order,0,0,108-4203
+RICKY EUSTICE,(616) 262-5484,JOHP - YZ80859,0,RO,X,7,1,Released for Payment,0,1,128-90959
+,,JOHP - LVU19403,0,RO,X,7,1,Released for Payment,0,1,128-90959
+2
+ of
+Open Back Orders - 2/11/2026 8:42 AM, Page,1,2
+Invoice
+Customer,Phone ,Part Number,Type,PP,Age,Ordered,Status,Available,Allocated,PO 
+ROGER ZIMMERMAN,(269) 903-1172,JOHP - R226265,0,RO,X,7,2,Released for Payment,0,2,128-90955
+,,JOHP - LVA801006,0,RO,X,1,1,On Order,0,0,128-90970
+,,JOHP - LVA801005,0,RO,X,7,1,Released for Payment,0,1,128-90955
+,,JOHP - AM117829,0,RO,X,7,1,Released for Payment,0,1,128-90955
+,,JOHP - 19M7164,0,RO,X,7,1,Released for Payment,9,1,128-90955
+,,JOHP - JD9449,0,RO,X,7,1,Released for Payment,0,1,128-90955
+,,JOHP - LVU803768,0,RO,X,7,3,Released for Payment,0,3,128-90955
+,,JOHP - LVA802575,0,RO,X,7,1,Released for Payment,0,1,128-90955
+RON MEJEUR,(269) 207-3866,JOHP - MIU10868,0,RO,X,15,1,Released for Payment,0,1,128-90918
+,,JOHP - M138429,0,RO,X,2,1,Received,0,1,128-90967
+,,JOHP - M76105,0,RO,X,2,1,Received,0,1,128-90967
+,,JOHP - MIU10832,0,RO,X,15,1,Released for Payment,0,1,128-90918
+,,JOHP - M76098,0,RO,X,15,1,Released for Payment,0,1,128-90918
+,,JOHP - MIU10855,0,RO,X,7,1,Released for Payment,0,1,128-90959
+SNYDER'S LAWNCARE,(269) 779-8350,BILP - 812225,0,RO,X,43,1,Released for Payment,0,1,193-82256
+STEENSMA LAWN SALES PLAINWELL,(269) 685-9557,JOHP - MIU12400,0,RO,X,1,1,On Order,0,0,128-90970
+TIM CLANCY ,(269) 217-0590,KAWP - 15004-1097,0,RO,X,5,1,Released for Payment,0,1,137-508
+2
+ of
+Open Back Orders - 2/11/2026 8:42 AM, Page,2,2
