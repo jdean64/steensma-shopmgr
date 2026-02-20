@@ -1,0 +1,12 @@
+Steensma Lawn Plainwell361 12th st.Plainwell, MI  49080,
+Scheduled Shop Jobs
+Mechanics
+Invoice,Customer,Model,Description,Estimated Time,Start Time,End Time,Priority,Status
+FIT IN WORK
+1814823,RICHARD RUNOWSKI,1025RwR4,Customer states he found a coolant leak. He can identify three leaks. Two of the three are on the right hand side between the cab and front axle. The other is where the radiator hose connects to the heater. Coolant resivior is empty.,1:55,2/18/2026,2/18/2026,097 - Residential ,Awaiting Start
+p.HOUSE ACCOUNT
+1815131,Dylan Oonk,LZX993EBV606X1,Lawn and Garden Tractor Tune-Up, 44" TO 72" Mower Deck with a hydro service,3:20,2/18/2026,2/18/2026,097 - Residential ,CUSTOMER DROP
+1818618,Bob Vallina,CUB CADET,Walk Behind Equipment Tune up Edger/Tiller/Blower/Pressure Washer - If blade needs to be replaced, please do it. States that it seems battery is low. Please evaluate & advise.,0:54,2/18/2026,2/18/2026,097 - Residential ,Awaiting Start
+Scheduled Shop Jobs - 2/17/2026 1:16 AM, Page,1,1
+ of
+1

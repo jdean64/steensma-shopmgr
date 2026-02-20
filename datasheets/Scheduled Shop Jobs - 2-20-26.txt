@@ -1,0 +1,11 @@
+Steensma Lawn Plainwell361 12th st.Plainwell, MI  49080,
+Scheduled Shop Jobs
+Mechanics
+Invoice,Customer,Model,Description,Estimated Time,Start Time,End Time,Priority,Status
+FIT IN WORK
+1815586,FRANK HARDESTER,44585-1,See previous RO. Unit is still leaking oil. Stopped by in January as problem was continuing from December's repair. ,1:20,2/20/2026,2/20/2026,097 - Residential ,CUSTOMER DROP
+p.HOUSE ACCOUNT
+1819932,BRIAN NEDERVELD,21472,CUSTOMER DROP OFF, THE DRIVE FUNCTION IS NOT WORKING ON THE REAR WHEELS.PLEASE EVALUATE AND ADVISE. SEASONAL TUNE UP AS WELL.,1:38,2/20/2026,2/20/2026,097 - Residential ,CUSTOMER DROP
+Scheduled Shop Jobs - 2/19/2026 7:50 PM, Page,1,1
+ of
+1

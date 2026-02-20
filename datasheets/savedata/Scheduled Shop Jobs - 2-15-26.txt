@@ -1,0 +1,17 @@
+Scheduled Shop Jobs
+Steensma Lawn Plainwell361 12th st.Plainwell, MI  49080,
+Mechanics
+Invoice,Customer,Model,Description,Estimated Time,Start Time,End Time,Priority,Status
+FIT IN WORK
+1815110,KEITH A. HOOGENBOOM,69500,PLOW INSTALL W/ NEW PLOW,7:16,2/16/2026,2/16/2026,097 - Residential ,Awaiting Start
+p.HOUSE ACCOUNT
+1816618,Asphalt Solutions Plus,LZE801CKA604A1,Lawn and Garden Tractor Tune-Up, 44" TO 72" Mower Deck,2:51,2/16/2026,2/16/2026,010 - Commercial ,Awaiting Start
+1817915,KEN COBURN,RAX691GKA524A3,Lawn and Garden Tractor Tune-Up, 44" TO 72" Mower Deck - Customer states the unit will not start. Test battery and chrage/replace as needed.,2:24,2/16/2026,2/16/2026,097 - Residential ,Awaiting Start
+1805350,Robin & Sandro Filiputti,2410 STORM,WAITING... UNIT WILL NOT START OR RUN. CUST THINKS THE CARB IS GUMMED UP. HAS BEEN SITTING AWHILE. ,0:38,2/17/2026,2/17/2026,097 - Residential ,PICK UP
+1818317,Michael Koetje,20381,CUSTOMER DROP OFF, TUNE UP, TORO 400549206,0:54,2/16/2026,2/16/2026,097 - Residential ,Awaiting Start
+1818545,Ron Northrup,21383,CUSTOMER DROP OFF FOR TUNE UP,0:54,2/16/2026,2/16/2026,097 - Residential ,Awaiting Start
+1818535,Robin & Sandro Filiputti,0077050,CUST USES REC FUEL. LAST TIME IT RAN WAS NOV 25. UNIT WILL CRANK BUT NO FIRE. MIGHT HAVE A BATT ISSUE AS WELL. CUST CHARGED THE BATT. FUEL IS NEW.,1:00,2/17/2026,2/17/2026,097 - Residential ,PICK UP
+1815625,JOHN GARSIDE,GATOR 590M CAMO W/Winch,TUNE UP ON XUV/GATOR,2:17,2/16/2026,2/16/2026,097 - Residential ,Awaiting Start
+1
+ of
+Scheduled Shop Jobs - 2/15/2026 7:12 PM, Page,1,1

@@ -1,0 +1,12 @@
+Steensma Lawn Plainwell361 12th st.Plainwell, MI  49080,
+Scheduled Shop Jobs
+Mechanics
+Invoice,Customer,Model,Description,Estimated Time,Start Time,End Time,Priority,Status
+p.HOUSE ACCOUNT
+1815131,Dylan Oonk,LZX993EBV606X1,Lawn and Garden Tractor Tune-Up, 44" TO 72" Mower Deck with a hydro service,3:20,2/18/2026,2/18/2026,097 - Residential ,CUSTOMER DROP
+1818104,Jason Daniels,31AE6A4E129,MISSING HANDLE BOLT. RUNS  ROUGH UNLESS THE CHOKE IS ON HALF WAY.,0:38,2/19/2026,2/19/2026,097 - Residential ,Awaiting Start
+1818606,DOUG RENEMA,X380W48A,UNIIT WAS IN SEPT. 2025 FOR TRANSMISSION FAN & PULLEY REPAIRS - GUEST STATES FIRST TIME HAVING MOWER OUT THIS WEEKEND THERE "SEEMS TO BE NO BRAKES" - TRACTOR ROLLS WITHOUT F & R PEDALS PRESSED AND BRAKE PEDAL DOESN'T STOP MOWER LIKE IT DID.,0:47,2/19/2026,2/19/2026,097 - Residential ,Awaiting Start
+1818618,Bob Vallina,CUB CADET,Walk Behind Equipment Tune up Edger/Tiller/Blower/Pressure Washer - If blade needs to be replaced, please do it. States that it seems battery is low. Please evaluate & advise.,0:54,2/18/2026,2/18/2026,097 - Residential ,Awaiting Start
+Scheduled Shop Jobs - 2/18/2026 1:41 AM, Page,1,1
+ of
+1

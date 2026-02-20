@@ -1,0 +1,9 @@
+Steensma Lawn Plainwell361 12th st.Plainwell, MI  49080,
+Bin Census Detailed
+Zone
+Bin,Line Code,Part Number,O/C,Description,Class,Available
+
+,WSPP,49567,N,PLOW MODULE 2 PORT,,-1
+Bin Census Detailed - 2/15/2026 7:10 PM, Page,1,1
+ of
+1

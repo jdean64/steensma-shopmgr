@@ -544,6 +544,9 @@ def parse_gross_profit_mechanic(filepath):
             
             import re
             
+            # Track whether the last-added mechanic still needs its Hours Worked line
+            awaiting_hours = False
+            
             for line in lines:
                 # Match mechanic summary lines - they start with 'b' or 'p' and mechanic name
                 if (line.startswith('bDerek Snyder,') or line.startswith('pDerek Snyder,')) and len(line) > 50:
@@ -563,6 +566,7 @@ def parse_gross_profit_mechanic(filepath):
                             'efficiency': 0,  # Will update from Hours Worked line
                             'labor_sales': labor_sales
                         })
+                        awaiting_hours = True
                 
                 elif (line.startswith('bChris Deman,') or line.startswith('pChris Deman,') or 
                       line.startswith('pCHRIS DEMANN,') or line.startswith('bCHRIS DEMANN,')) and len(line) > 50:
@@ -579,6 +583,7 @@ def parse_gross_profit_mechanic(filepath):
                             'efficiency': 0,
                             'labor_sales': labor_sales
                         })
+                        awaiting_hours = True
                 
                 elif (line.startswith('bBrandon Wallace,') or line.startswith('pBrandon Wallace,')) and len(line) > 50:
                     dollar_amounts = re.findall(r'\$[\d,]+\.?\d*', line)
@@ -594,10 +599,12 @@ def parse_gross_profit_mechanic(filepath):
                             'efficiency': 0,
                             'labor_sales': labor_sales
                         })
+                        awaiting_hours = True
                 
-                # Look for efficiency data - "Hours Worked:,61:14,71%,46%"
-                # Using the first percentage (index 2) not the second (index 3)
-                if 'Hours Worked:' in line:
+                # Look for efficiency data - "Hours Worked:,109:40,92%,81%"
+                # Only apply to the last mechanic if we are still expecting their Hours line.
+                # This prevents stray Hours Worked lines later in the file from overwriting.
+                elif awaiting_hours and 'Hours Worked:' in line:
                     parts = line.split(',')
                     if len(parts) >= 3:
                         try:
@@ -609,6 +616,7 @@ def parse_gross_profit_mechanic(filepath):
                                 mechanic_metrics[-1]['efficiency'] = efficiency
                         except:
                             pass
+                    awaiting_hours = False
             
             # Calculate overall efficiency
             efficiencies = [m['efficiency'] for m in mechanic_metrics if m['efficiency'] > 0]
